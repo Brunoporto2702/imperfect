@@ -4,7 +4,7 @@ import { AiResponseSchema, FoodEntry } from "./schema";
 
 const client = new Anthropic();
 
-const PROMPT = `You are a food calorie estimator. Parse the food description and return ONLY a JSON object — no explanation, no markdown.
+const PROMPT = `You are a food calorie estimator. Parse the food description. Return only valid JSON. No markdown. No commentary. No backticks.
 
 JSON structure:
 {
