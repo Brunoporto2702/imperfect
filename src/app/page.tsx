@@ -1,19 +1,68 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { FoodEntry } from "@/lib/schema";
+
+const STORAGE_KEY = "imperfect:history";
+
+function loadHistory(): FoodEntry[] {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "[]");
+  } catch {
+    return [];
+  }
+}
+
+function saveHistory(entries: FoodEntry[]) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+}
+
+function EntryCard({ entry }: { entry: FoodEntry }) {
+  return (
+    <div className="border rounded p-4 flex flex-col gap-3">
+      <div className="flex items-baseline justify-between">
+        <span className="font-semibold text-lg">
+          {entry.totalCaloriesMin}–{entry.totalCaloriesMax} kcal
+        </span>
+        <div className="flex gap-3 text-sm text-zinc-500">
+          {entry.totalProtein != null && (
+            <span>{entry.totalProtein}g protein</span>
+          )}
+          <span className="capitalize">{entry.confidence} confidence</span>
+        </div>
+      </div>
+
+      <ul className="flex flex-col gap-1 border-t pt-3">
+        {entry.items.map((item, i) => (
+          <li key={i} className="flex justify-between text-sm">
+            <span>
+              {item.quantity} {item.name}
+            </span>
+            <span className="text-zinc-500">
+              {item.caloriesMin}–{item.caloriesMax} kcal
+              {item.protein != null && ` · ${item.protein}g`}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
 export default function Home() {
   const [rawInput, setRawInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [entry, setEntry] = useState<FoodEntry | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [history, setHistory] = useState<FoodEntry[]>([]);
+
+  useEffect(() => {
+    setHistory(loadHistory());
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    setEntry(null);
 
     try {
       const res = await fetch("/api/entries", {
@@ -27,7 +76,11 @@ export default function Home() {
         throw new Error(data.error ?? `Request failed: ${res.status}`);
       }
 
-      setEntry(await res.json());
+      const entry: FoodEntry = await res.json();
+      const updated = [entry, ...history];
+      saveHistory(updated);
+      setHistory(updated);
+      setRawInput("");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
@@ -58,33 +111,12 @@ export default function Home() {
 
       {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
 
-      {entry && (
-        <div className="mt-6 border rounded p-4 flex flex-col gap-3">
-          <div className="flex items-baseline justify-between">
-            <span className="font-semibold text-lg">
-              {entry.totalCaloriesMin}–{entry.totalCaloriesMax} kcal
-            </span>
-            <div className="flex gap-3 text-sm text-zinc-500">
-              {entry.totalProtein != null && (
-                <span>{entry.totalProtein}g protein</span>
-              )}
-              <span className="capitalize">{entry.confidence} confidence</span>
-            </div>
-          </div>
-
-          <ul className="flex flex-col gap-1 border-t pt-3">
-            {entry.items.map((item, i) => (
-              <li key={i} className="flex justify-between text-sm">
-                <span>
-                  {item.quantity} {item.name}
-                </span>
-                <span className="text-zinc-500">
-                  {item.caloriesMin}–{item.caloriesMax} kcal
-                  {item.protein != null && ` · ${item.protein}g`}
-                </span>
-              </li>
-            ))}
-          </ul>
+      {history.length > 0 && (
+        <div className="mt-8 flex flex-col gap-4">
+          <h2 className="text-sm font-medium text-zinc-500">History</h2>
+          {history.map((entry) => (
+            <EntryCard key={entry.id} entry={entry} />
+          ))}
         </div>
       )}
     </main>
