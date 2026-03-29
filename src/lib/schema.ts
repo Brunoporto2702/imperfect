@@ -29,8 +29,5 @@ export const CreateEntryRequestSchema = z.object({
 // AI response schema — excludes server-generated fields (id, createdAt, rawInput)
 export const AiResponseSchema = z.object({
   items: z.array(FoodItemSchema),
-  totalCaloriesMin: z.number(),
-  totalCaloriesMax: z.number(),
-  totalProtein: z.number().optional(),
   confidence: z.enum(["low", "medium", "high"]),
 });

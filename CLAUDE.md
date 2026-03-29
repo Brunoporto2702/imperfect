@@ -45,7 +45,7 @@ lib/
 ```
 
 Core flow:
-user submits text (+ optional image later) → POST /api/entries → AI prompt → Zod-validated response → saved to SQLite → returned to UI
+user submits text (+ optional image later) → POST /api/entries → AI prompt → Zod-validated response → computeTotals() → saved to SQLite → returned to UI
 
 ## Data Model (must follow exactly)
 
@@ -79,10 +79,13 @@ type CreateEntryRequest = {
 
 ## AI Parsing Rules
 
-- Always return calorie **ranges** (min/max) — never a single exact number
+- AI returns only `items` + `confidence` — totals are **never** part of the AI response
+- `computeTotals()` in `route.ts` derives `totalCaloriesMin`, `totalCaloriesMax`, `totalProtein` from items before returning to the client
+- Always return calorie **ranges** (min/max) per item — never a single exact number
 - Use reasonable portion assumptions when not specified
 - Prefer underconfidence over false precision
 - AI output must be structured JSON, validated via Zod before use
+- Prompt includes a valid/invalid example pair to reduce markdown-wrapped or plain-text responses
 
 ## Constraints
 

@@ -1,6 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { CreateEntryRequestSchema } from "@/lib/schema";
+import { CreateEntryRequestSchema, FoodEntry } from "@/lib/schema";
 import { parseFood } from "@/lib/ai";
+
+function computeTotals(entry: Omit<FoodEntry, "totalCaloriesMin" | "totalCaloriesMax" | "totalProtein">): FoodEntry {
+  return {
+    ...entry,
+    totalCaloriesMin: entry.items.reduce((sum, item) => sum + item.caloriesMin, 0),
+    totalCaloriesMax: entry.items.reduce((sum, item) => sum + item.caloriesMax, 0),
+    totalProtein: entry.items.every((item) => item.protein == null)
+      ? undefined
+      : entry.items.reduce((sum, item) => sum + (item.protein ?? 0), 0),
+  };
+}
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -11,7 +22,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const entry = await parseFood(result.data.rawInput);
+    const entry = computeTotals(await parseFood(result.data.rawInput));
     return NextResponse.json(entry);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Failed to parse food";
