@@ -57,6 +57,21 @@ Rules:
 - confidence: "high" = clearly described, "medium" = portions assumed, "low" = vague description
 - Omit protein if truly unknown`;
 
+function sanitizeInput(input: string): string {
+  console.log("Raw AI output:", input);
+  let output = input;
+  // Basic sanitation to remove newlines and excessive whitespace
+  output = input.replace(/\s+/g, " ").trim();
+
+  // extract first json block if extra text is present
+  const jsonMatch = output.match(/\{.*\}/);
+  if (jsonMatch) {
+    output = jsonMatch[0];
+  }
+
+  return output;
+}
+
 export async function parseFood(rawInput: string): Promise<Omit<FoodEntry, "totalCaloriesMin" | "totalCaloriesMax" | "totalProtein">> {
   const message = await client.messages.create({
     model: "claude-haiku-4-5-20251001",
@@ -70,7 +85,7 @@ export async function parseFood(rawInput: string): Promise<Omit<FoodEntry, "tota
   });
 
   const text =
-    message.content[0].type === "text" ? message.content[0].text.trim() : "";
+    message.content[0].type === "text" ? sanitizeInput(message.content[0].text.trim()) : "";
 
   let parsed: unknown;
   try {
