@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import type { FoodEntry } from "@/lib/schema";
+import type { FoodEntry } from "@/core/models/food";
 
 const STORAGE_KEY = "imperfect:history";
 

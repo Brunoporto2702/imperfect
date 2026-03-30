@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { sanitizeInput, parseAIResponse } from "./ai";
+import { sanitizeInput, parseAIResponse } from "./parser";
 
 describe("sanitizeInput", () => {
   it("trims surrounding whitespace", () => {

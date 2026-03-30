@@ -8,6 +8,8 @@ export const FoodItemSchema = z.object({
   protein: z.number().optional(),
 });
 
+export type FoodItem = z.infer<typeof FoodItemSchema>;
+
 export const FoodEntrySchema = z.object({
   id: z.string(),
   createdAt: z.coerce.date(),
@@ -21,13 +23,3 @@ export const FoodEntrySchema = z.object({
 });
 
 export type FoodEntry = z.infer<typeof FoodEntrySchema>;
-
-export const CreateEntryRequestSchema = z.object({
-  rawInput: z.string().min(1),
-});
-
-// AI response schema — excludes server-generated fields (id, createdAt, rawInput)
-export const AiResponseSchema = z.object({
-  items: z.array(FoodItemSchema),
-  confidence: z.enum(["low", "medium", "high"]),
-});

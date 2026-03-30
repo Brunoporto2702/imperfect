@@ -1,10 +1,7 @@
 import { describe, it, expect } from "vitest";
-import {
-  FoodItemSchema,
-  FoodEntrySchema,
-  AiResponseSchema,
-  CreateEntryRequestSchema,
-} from "./schema";
+import { FoodItemSchema, FoodEntrySchema } from "./food";
+import { AiResponseSchema } from "./ai";
+import { CreateEntryRequestSchema } from "./entry";
 
 describe("FoodItemSchema", () => {
   it("accepts a valid item with all fields", () => {

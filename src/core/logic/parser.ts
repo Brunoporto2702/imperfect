@@ -1,9 +1,8 @@
 import { randomUUID } from "crypto";
-import { AiResponseSchema, FoodEntry } from "./schema";
+import { AiResponseSchema } from "../models/ai";
+import { FoodEntry } from "../models/food";
 
-export type AIParser = (
-  rawInput: string
-) => Promise<Omit<FoodEntry, "totalCaloriesMin" | "totalCaloriesMax" | "totalProtein">>;
+export type AIProvider = (message: string) => Promise<string>;
 
 export function sanitizeInput(input: string): string {
   let output = input.replace(/\s+/g, " ").trim();

@@ -1,9 +1,3 @@
-import Anthropic from "@anthropic-ai/sdk";
-import type { AIParser } from "./ai";
-import { parseAIResponse } from "./ai";
-
-const client = new Anthropic();
-
 const PROMPT = `You are a food calorie estimator. Parse the food description. Return ONLY valid JSON. No markdown. No commentary. No backticks.
 
 example valid response:
@@ -57,20 +51,6 @@ Rules:
 - confidence: "high" = clearly described, "medium" = portions assumed, "low" = vague description
 - Omit protein if truly unknown`;
 
-export const parseFood: AIParser = async (rawInput) => {
-  const message = await client.messages.create({
-    model: "claude-haiku-4-5-20251001",
-    max_tokens: 1024,
-    messages: [
-      {
-        role: "user",
-        content: `${PROMPT}\n\nFood description: ${rawInput}`,
-      },
-    ],
-  });
-
-  const rawText =
-    message.content[0].type === "text" ? message.content[0].text.trim() : "";
-
-  return parseAIResponse(rawText, rawInput);
-};
+export function buildPrompt(rawInput: string): string {
+  return `${PROMPT}\n\nFood description: ${rawInput}`;
+}
