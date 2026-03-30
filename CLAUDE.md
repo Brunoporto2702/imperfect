@@ -15,7 +15,7 @@ Optimizing for: **shipping a usable product fast, not perfection.**
 npm run dev       # Start dev server (Next.js)
 npm run build     # Production build
 npm run lint      # ESLint
-npm run typecheck # tsc --noEmit
+npx tsc --noEmit  # Type check
 npm test          # Vitest (unit + integration)
 ```
 
@@ -35,7 +35,8 @@ Ports and adapters on the backend. Feature-Sliced Design on the frontend.
 ```
 src/
   app/
-    page.tsx                          # Shell — renders FoodPage
+    page.tsx                          # / — renders DashboardPage
+    new/page.tsx                      # /new — renders NewEntryPage
     api/entries/route.ts              # POST /api/entries — wires provider, delegates to service
 
   server/
@@ -61,13 +62,19 @@ src/
       entries/
         api.ts                        # createEntry(rawInput) — calls POST /api/entries
         history.ts                    # loadHistory / saveHistory — uses storage infra
+    pages/
+      DashboardPage.tsx               # Dashboard — weekly summary + history + FAB
+      NewEntryPage.tsx                # New entry — form → AI preview → accept/discard
     components/
-      EntryCard.tsx                   # Pure UI component
-      FoodPage.tsx                    # Main page component
+      EntryCard.tsx                   # Reusable UI atom
 ```
 
+Client layer rules:
+- **`pages/`** — page-level components: own layout, route logic, and business orchestration. Not reused across routes.
+- **`components/`** — reusable atoms with no route awareness or side effects.
+
 Core flow:
-user submits text → `FoodPage` → `features/entries/api` → POST /api/entries → `createEntry(rawInput, provider)` → `buildPrompt` → AI → `parseAIResponse` → `computeTotals` → returned to UI → saved to localStorage history
+user submits text → `NewEntryPage` → `features/entries/api` → POST /api/entries → `createEntry(rawInput, provider)` → `buildPrompt` → AI → `parseAIResponse` → `computeTotals` → previewed in UI → on accept: saved to localStorage → redirect to dashboard
 
 ## Data Model (must follow exactly)
 
