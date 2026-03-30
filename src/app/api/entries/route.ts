@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { CreateEntryRequestSchema } from "@/core/models/entry";
-import { createEntry } from "@/core/services/food";
-import { type AIProvider } from "@/core/logic/parser";
-import { anthropicProvider } from "@/providers/ai.anthropic";
+import { CreateEntryRequestSchema } from "@/server/core/models/entry";
+import { createEntry } from "@/server/core/services/food";
+import { type AIProvider } from "@/server/core/logic/parser";
+import { anthropicProvider } from "@/server/providers/ai.anthropic";
 
 export function createHandler(provider: AIProvider) {
   return async function POST(request: NextRequest) {

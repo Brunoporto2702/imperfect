@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import type { AIProvider } from "@/core/logic/parser";
+import type { AIProvider } from "@/server/core/logic/parser";
 
 const client = new Anthropic();
 

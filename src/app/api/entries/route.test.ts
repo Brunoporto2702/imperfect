@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { NextRequest } from "next/server";
 import { createHandler } from "./route";
-import type { AIProvider } from "@/core/logic/parser";
+import type { AIProvider } from "@/server/core/logic/parser";
 
 const validAIResponse = JSON.stringify({
   items: [
