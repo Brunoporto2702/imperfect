@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { CreateEntryRequestSchema, FoodEntry } from "@/lib/schema";
-import { parseFood } from "@/lib/ai";
+import type { AIParser } from "@/lib/ai";
+import { parseFood } from "@/lib/ai.anthropic";
 
-function computeTotals(entry: Omit<FoodEntry, "totalCaloriesMin" | "totalCaloriesMax" | "totalProtein">): FoodEntry {
+export function computeTotals(
+  entry: Omit<FoodEntry, "totalCaloriesMin" | "totalCaloriesMax" | "totalProtein">
+): FoodEntry {
   return {
     ...entry,
     totalCaloriesMin: entry.items.reduce((sum, item) => sum + item.caloriesMin, 0),
@@ -13,19 +16,23 @@ function computeTotals(entry: Omit<FoodEntry, "totalCaloriesMin" | "totalCalorie
   };
 }
 
-export async function POST(request: NextRequest) {
-  const body = await request.json();
+export function createHandler(parser: AIParser) {
+  return async function POST(request: NextRequest) {
+    const body = await request.json();
 
-  const result = CreateEntryRequestSchema.safeParse(body);
-  if (!result.success) {
-    return NextResponse.json({ error: result.error.flatten() }, { status: 400 });
-  }
+    const result = CreateEntryRequestSchema.safeParse(body);
+    if (!result.success) {
+      return NextResponse.json({ error: result.error.flatten() }, { status: 400 });
+    }
 
-  try {
-    const entry = computeTotals(await parseFood(result.data.rawInput));
-    return NextResponse.json(entry);
-  } catch (err) {
-    const message = err instanceof Error ? err.message : "Failed to parse food";
-    return NextResponse.json({ error: message }, { status: 500 });
-  }
+    try {
+      const entry = computeTotals(await parser(result.data.rawInput));
+      return NextResponse.json(entry);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to parse food";
+      return NextResponse.json({ error: message }, { status: 500 });
+    }
+  };
 }
+
+export const POST = createHandler(parseFood);
