@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { CreateEntryRequestSchema } from "@/core/models/entry";
-import { createFoodService, type FoodService } from "@/core/services/food";
+import { createEntry } from "@/core/services/food";
+import { type AIProvider } from "@/core/logic/parser";
 import { anthropicProvider } from "@/providers/ai.anthropic";
 
-export function createHandler(service: FoodService) {
+export function createHandler(provider: AIProvider) {
   return async function POST(request: NextRequest) {
     const body = await request.json();
 
@@ -13,7 +14,7 @@ export function createHandler(service: FoodService) {
     }
 
     try {
-      const entry = await service.createEntry(result.data.rawInput);
+      const entry = await createEntry(result.data.rawInput, provider);
       return NextResponse.json(entry);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to parse food";
@@ -22,4 +23,4 @@ export function createHandler(service: FoodService) {
   };
 }
 
-export const POST = createHandler(createFoodService(anthropicProvider));
+export const POST = createHandler(anthropicProvider);
