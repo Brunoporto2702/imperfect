@@ -69,7 +69,7 @@ export function NewEntryPage() {
         ← Back
       </Link>
       <h1 className="text-2xl font-bold mb-6">New entry</h1>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-3 w-full">
         <textarea
           className="border rounded p-3 w-full min-h-[100px] resize-y text-sm"
           placeholder='What did you eat? e.g. "two scrambled eggs and a slice of toast"'
