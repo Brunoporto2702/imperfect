@@ -4,19 +4,10 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import type { FoodEntry } from "@/server/core/models/food";
 import { loadHistory } from "@/client/features/entries/history";
+import { getWeeklyStats } from "@/client/logic/entries";
+import { buildWeeklyChart } from "@/client/logic/chart";
 import { EntryCard } from "@/client/components/EntryCard";
-
-function getWeeklyStats(entries: FoodEntry[]) {
-  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-  const week = entries.filter((e) => new Date(e.createdAt) >= weekAgo);
-
-  return {
-    count: week.length,
-    calMin: week.reduce((s, e) => s + e.totalCaloriesMin, 0),
-    calMax: week.reduce((s, e) => s + e.totalCaloriesMax, 0),
-    protein: week.reduce((s, e) => s + (e.totalProtein ?? 0), 0),
-  };
-}
+import { WeeklyCaloriesChart } from "@/client/components/WeeklyCaloriesChart";
 
 export function DashboardPage() {
   const [history, setHistory] = useState<FoodEntry[]>([]);
@@ -26,6 +17,7 @@ export function DashboardPage() {
   }, []);
 
   const weekly = getWeeklyStats(history);
+  const chartDays = buildWeeklyChart(history);
 
   return (
     <main className="max-w-xl mx-auto p-8 pb-28">
@@ -58,6 +50,15 @@ export function DashboardPage() {
           </div>
         )}
       </div>
+
+      {weekly.count > 0 && (
+        <div className="px-1 mb-8">
+          <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-3">
+            Calories / day
+          </p>
+          <WeeklyCaloriesChart days={chartDays} />
+        </div>
+      )}
 
       {history.length > 0 && (
         <div className="flex flex-col gap-4">

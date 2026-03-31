@@ -62,14 +62,19 @@ src/
       entries/
         api.ts                        # createEntry(rawInput) — calls POST /api/entries
         history.ts                    # loadHistory / saveHistory — uses storage infra
+    logic/
+      entries.ts                      # getWeeklyStats — pure calculations over FoodEntry[]
+      chart.ts                        # buildWeeklyChart + DayBar type — pure, FoodEntry[] → chart data
     pages/
-      DashboardPage.tsx               # Dashboard — weekly summary + history + FAB
+      DashboardPage.tsx               # Dashboard — weekly summary + chart + history + FAB
       NewEntryPage.tsx                # New entry — form → AI preview → accept/discard
     components/
-      EntryCard.tsx                   # Reusable UI atom
+      EntryCard.tsx                   # Reusable UI atom — shows rawInput, date, cal range, items
+      WeeklyCaloriesChart.tsx         # SVG box plot — daily calorie ranges + weekly avg reference line
 ```
 
 Client layer rules:
+- **`logic/`** — pure functions over domain data. No framework dependencies, no side effects. Mirrors `server/core/logic/`.
 - **`pages/`** — page-level components: own layout, route logic, and business orchestration. Not reused across routes.
 - **`components/`** — reusable atoms with no route awareness or side effects.
 
