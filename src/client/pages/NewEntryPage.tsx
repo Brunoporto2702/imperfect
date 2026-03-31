@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import type { FoodEntry } from "@/server/core/models/food";
 import { createEntry } from "@/client/features/entries/api";
 import { loadHistory, saveHistory } from "@/client/features/entries/history";
@@ -64,6 +65,9 @@ export function NewEntryPage() {
 
   return (
     <main className="max-w-xl mx-auto p-8">
+      <Link href="/" className="text-sm text-zinc-400 hover:text-zinc-700 transition-colors mb-6 inline-block">
+        ← Back
+      </Link>
       <h1 className="text-2xl font-bold mb-6">New entry</h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <textarea
