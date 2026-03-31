@@ -10,3 +10,7 @@ export function loadHistory(): FoodEntry[] {
 export function saveHistory(entries: FoodEntry[]): void {
   setItem(STORAGE_KEY, entries);
 }
+
+export function deleteEntry(id: string): void {
+  setItem(STORAGE_KEY, loadHistory().filter((e) => e.id !== id));
+}

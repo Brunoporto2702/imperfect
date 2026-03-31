@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import type { FoodEntry } from "@/server/core/models/food";
-import { loadHistory } from "@/client/features/entries/history";
+import { loadHistory, deleteEntry } from "@/client/features/entries/history";
 import { getWeeklyStats } from "@/client/logic/entries";
 import { buildWeeklyChart } from "@/client/logic/chart";
 import { EntryCard } from "@/client/components/EntryCard";
@@ -15,6 +15,11 @@ export function DashboardPage() {
   useEffect(() => {
     setHistory(loadHistory());
   }, []);
+
+  function handleDelete(id: string) {
+    deleteEntry(id);
+    setHistory((prev) => prev.filter((e) => e.id !== id));
+  }
 
   const weekly = getWeeklyStats(history);
   const chartDays = buildWeeklyChart(history);
@@ -64,7 +69,7 @@ export function DashboardPage() {
         <div className="flex flex-col gap-4">
           <h2 className="text-sm font-medium text-zinc-500">History</h2>
           {history.map((entry) => (
-            <EntryCard key={entry.id} entry={entry} />
+            <EntryCard key={entry.id} entry={entry} onDelete={handleDelete} />
           ))}
         </div>
       )}
