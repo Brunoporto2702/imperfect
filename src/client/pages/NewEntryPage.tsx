@@ -32,7 +32,7 @@ export function NewEntryPage() {
   function handleAccept() {
     if (!preview) return;
     saveHistory([preview, ...loadHistory()]);
-    router.push("/");
+    router.push("/?saved=1");
   }
 
   function handleDiscard() {
