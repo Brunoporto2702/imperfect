@@ -28,50 +28,60 @@ export function DashboardPage() {
     <main className="max-w-xl mx-auto p-8 pb-28">
       <h1 className="text-2xl font-bold mb-6">Imperfect</h1>
 
-      <div className="border rounded-lg p-5 mb-8">
-        <h2 className="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-4">
-          This week
-        </h2>
-        {weekly.count === 0 ? (
-          <p className="text-sm text-zinc-400">No entries yet. Add your first meal.</p>
-        ) : (
-          <div className="flex gap-8">
-            <div>
-              <p className="text-xl font-semibold">
-                {weekly.calMin}–{weekly.calMax}
-              </p>
-              <p className="text-xs text-zinc-500 mt-0.5">kcal</p>
-            </div>
-            {weekly.protein > 0 && (
+      {history.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-20 text-center gap-4">
+          <p className="text-4xl">🍽️</p>
+          <p className="text-lg font-semibold">Nothing tracked yet</p>
+          <p className="text-sm text-zinc-500 max-w-xs">
+            Log your first meal and get an instant calorie and protein estimate.
+          </p>
+          <Link
+            href="/new"
+            className="mt-2 bg-black text-white rounded px-5 py-2.5 text-sm hover:bg-zinc-800 transition-colors"
+          >
+            Add first meal
+          </Link>
+        </div>
+      ) : (
+        <>
+          <div className="border rounded-lg p-5 mb-8">
+            <h2 className="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-4">
+              This week
+            </h2>
+            <div className="flex gap-8">
               <div>
-                <p className="text-xl font-semibold">{weekly.protein}g</p>
-                <p className="text-xs text-zinc-500 mt-0.5">protein</p>
+                <p className="text-xl font-semibold">
+                  {weekly.calMin}–{weekly.calMax}
+                </p>
+                <p className="text-xs text-zinc-500 mt-0.5">kcal</p>
               </div>
-            )}
-            <div>
-              <p className="text-xl font-semibold">{weekly.count}</p>
-              <p className="text-xs text-zinc-500 mt-0.5">entries</p>
+              {weekly.protein > 0 && (
+                <div>
+                  <p className="text-xl font-semibold">{weekly.protein}g</p>
+                  <p className="text-xs text-zinc-500 mt-0.5">protein</p>
+                </div>
+              )}
+              <div>
+                <p className="text-xl font-semibold">{weekly.count}</p>
+                <p className="text-xs text-zinc-500 mt-0.5">entries</p>
+              </div>
             </div>
           </div>
-        )}
-      </div>
 
-      {weekly.count > 0 && (
-        <div className="px-1 mb-8">
-          <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-3">
-            Calories / day
-          </p>
-          <WeeklyCaloriesChart days={chartDays} />
-        </div>
-      )}
+          <div className="px-1 mb-8">
+            <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-3">
+              Calories / day
+            </p>
+            <WeeklyCaloriesChart days={chartDays} />
+          </div>
 
-      {history.length > 0 && (
-        <div className="flex flex-col gap-4">
-          <h2 className="text-sm font-medium text-zinc-500">History</h2>
-          {history.map((entry) => (
-            <EntryCard key={entry.id} entry={entry} onDelete={handleDelete} />
-          ))}
-        </div>
+          <div className="flex flex-col gap-4">
+            <h2 className="text-sm font-medium text-zinc-500">History</h2>
+            {history.map((entry) => (
+              <EntryCard key={entry.id} entry={entry} onDelete={handleDelete} />
+            ))}
+          </div>
+        </>
       )}
 
       <Link
