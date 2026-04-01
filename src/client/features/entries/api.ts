@@ -1,6 +1,11 @@
 import { post } from "@/client/infra/http";
-import type { FoodEntry } from "@/server/core/models/food";
+import type { IntakeEntry, IntakeItem } from "@/server/core/models/food";
 
-export function createEntry(rawInput: string): Promise<FoodEntry> {
-  return post<FoodEntry>("/api/entries", { rawInput });
+export type CreateEntryResponse = {
+  intakeEntry: IntakeEntry;
+  intakeItems: IntakeItem[];
+};
+
+export function createEntry(rawInput: string): Promise<CreateEntryResponse> {
+  return post<CreateEntryResponse>("/api/entries", { rawInput });
 }
