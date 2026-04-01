@@ -140,9 +140,14 @@ export function DashboardPage() {
               <div key={day.dateKey}>
                 <div className="flex items-baseline justify-between mb-2">
                   <span className="text-sm font-semibold">{day.label}</span>
-                  <span className="text-xs text-zinc-400">
-                    {day.calMin}–{day.calMax} kcal
-                  </span>
+                  <div className="flex items-baseline gap-3">
+                    <span className="text-xs text-zinc-400">
+                      {day.calMin}–{day.calMax} kcal
+                    </span>
+                    <Link href="/items" className="text-xs text-zinc-400 hover:text-zinc-700 transition-colors">
+                      Edit
+                    </Link>
+                  </div>
                 </div>
                 <ul className="flex flex-col gap-1">
                   {day.items.map((item) => (

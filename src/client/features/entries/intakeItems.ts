@@ -22,3 +22,9 @@ export function deleteIntakeItem(id: string): void {
 export function deleteIntakeItemsByProcessingId(processingId: string): void {
   saveIntakeItems(loadIntakeItems().filter((item) => item.processingId !== processingId));
 }
+
+export function updateIntakeItem(updated: IntakeItem): void {
+  saveIntakeItems(
+    loadIntakeItems().map((item) => (item.id === updated.id ? updated : item))
+  );
+}
