@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import type { FoodEntry } from "@/server/core/models/food";
 import { loadHistory, deleteEntry } from "@/client/features/entries/history";
+import { loadTarget, saveTarget } from "@/client/features/entries/target";
 import { getWeeklyStats } from "@/client/logic/entries";
 import { buildWeeklyChart } from "@/client/logic/chart";
 import { EntryCard } from "@/client/components/EntryCard";
@@ -14,10 +15,27 @@ export function DashboardPage() {
   const [history, setHistory] = useState<FoodEntry[]>([]);
   const searchParams = useSearchParams();
   const [savedBanner, setSavedBanner] = useState(searchParams.get("saved") === "1");
+  const [target, setTarget] = useState<number | null>(null);
+  const [targetInput, setTargetInput] = useState("");
 
   useEffect(() => {
     setHistory(loadHistory());
+    const stored = loadTarget();
+    setTarget(stored);
+    setTargetInput(stored != null ? String(stored) : "");
   }, []);
+
+  function handleTargetBlur() {
+    const parsed = parseInt(targetInput, 10);
+    if (!targetInput.trim() || isNaN(parsed) || parsed <= 0) {
+      saveTarget(null);
+      setTarget(null);
+      setTargetInput("");
+    } else {
+      saveTarget(parsed);
+      setTarget(parsed);
+    }
+  }
 
   function handleDelete(id: string) {
     deleteEntry(id);
@@ -84,10 +102,27 @@ export function DashboardPage() {
           </div>
 
           <div className="px-1 mb-8">
-            <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-3">
-              Calories / day
-            </p>
-            <WeeklyCaloriesChart days={chartDays} />
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide">
+                Calories / day
+              </p>
+              <div className="flex items-center gap-1.5">
+                <label className="text-xs text-zinc-400" htmlFor="daily-target">
+                  Target
+                </label>
+                <input
+                  id="daily-target"
+                  type="number"
+                  min={1}
+                  placeholder="kcal"
+                  value={targetInput}
+                  onChange={(e) => setTargetInput(e.target.value)}
+                  onBlur={handleTargetBlur}
+                  className="w-20 text-xs border rounded px-2 py-1 text-right text-blue-500 placeholder:text-zinc-300 focus:outline-none focus:ring-1 focus:ring-blue-300"
+                />
+              </div>
+            </div>
+            <WeeklyCaloriesChart days={chartDays} target={target ?? undefined} />
           </div>
 
           <div className="flex flex-col gap-4">
