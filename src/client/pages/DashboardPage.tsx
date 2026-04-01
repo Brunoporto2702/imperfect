@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import type { FoodEntry } from "@/server/core/models/food";
-import { loadHistory, deleteEntry } from "@/client/features/entries/history";
+import type { IntakeEntry, IntakeItem } from "@/server/core/models/food";
+import { loadIntakeEntries } from "@/client/features/entries/intakeEntries";
+import { loadIntakeItems, deleteIntakeItemsByProcessingId } from "@/client/features/entries/intakeItems";
 import { loadTarget, saveTarget } from "@/client/features/profile/target";
 import { getWeeklyStats } from "@/client/logic/entries";
 import { buildWeeklyChart } from "@/client/logic/chart";
@@ -12,18 +13,26 @@ import { EntryCard } from "@/client/components/EntryCard";
 import { WeeklyCaloriesChart } from "@/client/components/WeeklyCaloriesChart";
 
 export function DashboardPage() {
-  const [history, setHistory] = useState<FoodEntry[]>([]);
+  const [entries, setEntries] = useState<IntakeEntry[]>([]);
+  const [items, setItems] = useState<IntakeItem[]>([]);
   const searchParams = useSearchParams();
   const [savedBanner, setSavedBanner] = useState(searchParams.get("saved") === "1");
   const [target, setTarget] = useState<number | null>(null);
   const [targetInput, setTargetInput] = useState("");
 
   useEffect(() => {
-    setHistory(loadHistory());
+    setEntries(loadIntakeEntries());
+    setItems(loadIntakeItems());
     const stored = loadTarget();
     setTarget(stored);
     setTargetInput(stored != null ? String(stored) : "");
   }, []);
+
+  function handleDelete(processingId: string) {
+    deleteIntakeItemsByProcessingId(processingId);
+    setEntries((prev) => prev.filter((e) => e.id !== processingId));
+    setItems((prev) => prev.filter((item) => item.processingId !== processingId));
+  }
 
   function handleTargetBlur() {
     const parsed = parseInt(targetInput, 10);
@@ -37,13 +46,8 @@ export function DashboardPage() {
     }
   }
 
-  function handleDelete(id: string) {
-    deleteEntry(id);
-    setHistory((prev) => prev.filter((e) => e.id !== id));
-  }
-
-  const weekly = getWeeklyStats(history);
-  const chartDays = buildWeeklyChart(history);
+  const weekly = getWeeklyStats(items);
+  const chartDays = buildWeeklyChart(items);
 
   return (
     <main className="w-full max-w-xl mx-auto p-8 pb-28">
@@ -61,7 +65,7 @@ export function DashboardPage() {
       )}
       <h1 className="text-2xl font-bold mb-6">Imperfect</h1>
 
-      {history.length === 0 ? (
+      {entries.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center gap-4">
           <p className="text-4xl">🍽️</p>
           <p className="text-lg font-semibold">Nothing tracked yet</p>
@@ -127,8 +131,13 @@ export function DashboardPage() {
 
           <div className="flex flex-col gap-4">
             <h2 className="text-sm font-medium text-zinc-500">History</h2>
-            {history.map((entry) => (
-              <EntryCard key={entry.id} entry={entry} onDelete={handleDelete} />
+            {entries.map((entry) => (
+              <EntryCard
+                key={entry.id}
+                entry={entry}
+                items={items.filter((item) => item.processingId === entry.id)}
+                onDelete={handleDelete}
+              />
             ))}
           </div>
         </>

@@ -1,6 +1,6 @@
-import type { FoodEntry } from "@/server/core/models/food";
+import type { IntakeEntry, IntakeItem } from "@/server/core/models/food";
 
-function formatDate(value: Date | string): string {
+function formatDate(value: string): string {
   const d = new Date(value);
   const isToday = d.toDateString() === new Date().toDateString();
   return isToday
@@ -10,11 +10,19 @@ function formatDate(value: Date | string): string {
 
 export function EntryCard({
   entry,
+  items,
   onDelete,
 }: {
-  entry: FoodEntry;
-  onDelete?: (id: string) => void;
+  entry: IntakeEntry;
+  items: IntakeItem[];
+  onDelete?: (processingId: string) => void;
 }) {
+  const totalCalMin = items.reduce((s, i) => s + i.caloriesMin, 0);
+  const totalCalMax = items.reduce((s, i) => s + i.caloriesMax, 0);
+  const totalProtein = items.every((i) => i.protein == null)
+    ? null
+    : items.reduce((s, i) => s + (i.protein ?? 0), 0);
+
   function handleDelete() {
     if (confirm("Delete this entry?")) {
       onDelete?.(entry.id);
@@ -25,7 +33,7 @@ export function EntryCard({
     <div className="border rounded p-4 flex flex-col gap-3">
       <div className="flex items-start justify-between gap-4">
         <p className="text-sm font-medium leading-snug line-clamp-2">
-          {entry.rawInput}
+          {entry.inputText}
         </p>
         <div className="flex items-center gap-2 shrink-0">
           <span className="text-xs text-zinc-400 whitespace-nowrap">
@@ -45,19 +53,17 @@ export function EntryCard({
 
       <div className="flex items-baseline justify-between border-t pt-3">
         <span className="font-semibold text-lg">
-          {entry.totalCaloriesMin}–{entry.totalCaloriesMax} kcal
+          {totalCalMin}–{totalCalMax} kcal
         </span>
         <div className="flex gap-3 text-sm text-zinc-500">
-          {entry.totalProtein != null && (
-            <span>{entry.totalProtein}g protein</span>
-          )}
+          {totalProtein != null && <span>{totalProtein}g protein</span>}
           <span className="capitalize">{entry.confidence} confidence</span>
         </div>
       </div>
 
       <ul className="flex flex-col gap-1">
-        {entry.items.map((item, i) => (
-          <li key={i} className="flex justify-between text-sm">
+        {items.map((item) => (
+          <li key={item.id} className="flex justify-between text-sm">
             <span>
               {item.quantity} {item.name}
             </span>
