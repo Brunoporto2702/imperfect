@@ -65,8 +65,6 @@ export function DashboardPage() {
         </div>
       )}
 
-      <h1 className="text-2xl font-bold mb-6">Imperfect</h1>
-
       {entries.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center gap-4">
           <p className="text-4xl">🍽️</p>
