@@ -28,7 +28,7 @@ export function DashboardPage() {
   const chartDays = buildWeeklyChart(history);
 
   return (
-    <main className="max-w-xl mx-auto p-8 pb-28">
+    <main className="w-full max-w-xl mx-auto p-8 pb-28">
       {savedBanner && (
         <div className="flex items-center justify-between bg-green-50 border border-green-200 text-green-800 text-sm rounded px-4 py-2.5 mb-6">
           <span>Entry saved.</span>

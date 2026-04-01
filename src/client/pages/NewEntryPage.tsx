@@ -42,7 +42,7 @@ export function NewEntryPage() {
 
   if (preview) {
     return (
-      <main className="max-w-xl mx-auto p-8">
+      <main className="w-full max-w-xl mx-auto p-8">
         <h1 className="text-2xl font-bold mb-6">Review entry</h1>
         <EntryCard entry={preview} />
         <div className="mt-6 flex gap-3">
@@ -64,7 +64,7 @@ export function NewEntryPage() {
   }
 
   return (
-    <main className="max-w-xl mx-auto p-8">
+    <main className="w-full max-w-xl mx-auto p-8">
       <Link href="/" className="text-sm text-zinc-400 hover:text-zinc-700 transition-colors mb-6 inline-block">
         ← Back
       </Link>
