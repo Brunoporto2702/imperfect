@@ -14,8 +14,8 @@ export function createHandler(provider: AIProvider) {
     }
 
     try {
-      const entry = await createEntry(result.data.rawInput, provider);
-      return NextResponse.json(entry);
+      const { intakeEntry, intakeItems } = await createEntry(result.data.rawInput, provider);
+      return NextResponse.json({ intakeEntry, intakeItems });
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to parse food";
       return NextResponse.json({ error: message }, { status: 500 });

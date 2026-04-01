@@ -1,13 +1,13 @@
-import type { FoodEntry } from "@/server/core/models/food";
+import type { IntakeItem } from "@/server/core/models/food";
 
-export function getWeeklyStats(entries: FoodEntry[]) {
-  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-  const week = entries.filter((e) => new Date(e.createdAt) >= weekAgo);
+export function getWeeklyStats(items: IntakeItem[]) {
+  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const week = items.filter((item) => item.consumedAt >= weekAgo);
 
   return {
     count: week.length,
-    calMin: week.reduce((s, e) => s + e.totalCaloriesMin, 0),
-    calMax: week.reduce((s, e) => s + e.totalCaloriesMax, 0),
-    protein: week.reduce((s, e) => s + (e.totalProtein ?? 0), 0),
+    calMin: week.reduce((s, item) => s + item.caloriesMin, 0),
+    calMax: week.reduce((s, item) => s + item.caloriesMax, 0),
+    protein: week.reduce((s, item) => s + (item.protein ?? 0), 0),
   };
 }

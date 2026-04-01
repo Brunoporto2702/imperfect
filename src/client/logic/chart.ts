@@ -1,4 +1,4 @@
-import type { FoodEntry } from "@/server/core/models/food";
+import type { IntakeItem } from "@/server/core/models/food";
 
 export type DayBar = {
   label: string;
@@ -9,7 +9,7 @@ export type DayBar = {
 
 const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-export function buildWeeklyChart(entries: FoodEntry[]): DayBar[] {
+export function buildWeeklyChart(items: IntakeItem[]): DayBar[] {
   return Array.from({ length: 7 }, (_, i) => {
     const date = new Date();
     date.setHours(0, 0, 0, 0);
@@ -18,13 +18,13 @@ export function buildWeeklyChart(entries: FoodEntry[]): DayBar[] {
     const next = new Date(date);
     next.setDate(next.getDate() + 1);
 
-    const dayEntries = entries.filter((e) => {
-      const d = new Date(e.createdAt);
+    const dayItems = items.filter((item) => {
+      const d = new Date(item.consumedAt);
       return d >= date && d < next;
     });
 
-    const calMin = dayEntries.reduce((s, e) => s + e.totalCaloriesMin, 0);
-    const calMax = dayEntries.reduce((s, e) => s + e.totalCaloriesMax, 0);
+    const calMin = dayItems.reduce((s, item) => s + item.caloriesMin, 0);
+    const calMax = dayItems.reduce((s, item) => s + item.caloriesMax, 0);
 
     return {
       label: DAY_LABELS[date.getDay()],

@@ -3,9 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import type { FoodEntry } from "@/server/core/models/food";
+import type { IntakeEntry, IntakeItem } from "@/server/core/models/food";
 import { createEntry } from "@/client/features/entries/api";
-import { loadHistory, saveHistory } from "@/client/features/entries/history";
+import { addIntakeEntry } from "@/client/features/entries/intakeEntries";
+import { addIntakeItems } from "@/client/features/entries/intakeItems";
 import { EntryCard } from "@/client/components/EntryCard";
 
 export function NewEntryPage() {
@@ -13,7 +14,7 @@ export function NewEntryPage() {
   const [rawInput, setRawInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [preview, setPreview] = useState<FoodEntry | null>(null);
+  const [preview, setPreview] = useState<{ entry: IntakeEntry; items: IntakeItem[] } | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -21,8 +22,8 @@ export function NewEntryPage() {
     setError(null);
 
     try {
-      const entry = await createEntry(rawInput);
-      setPreview(entry);
+      const { intakeEntry, intakeItems } = await createEntry(rawInput);
+      setPreview({ entry: intakeEntry, items: intakeItems });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
@@ -32,7 +33,8 @@ export function NewEntryPage() {
 
   function handleAccept() {
     if (!preview) return;
-    saveHistory([preview, ...loadHistory()]);
+    addIntakeEntry(preview.entry);
+    addIntakeItems(preview.items);
     router.push("/?saved=1");
   }
 
@@ -44,7 +46,7 @@ export function NewEntryPage() {
     return (
       <main className="w-full max-w-xl mx-auto p-8">
         <h1 className="text-2xl font-bold mb-6">Review entry</h1>
-        <EntryCard entry={preview} />
+        <EntryCard entry={preview.entry} items={preview.items} />
         <div className="mt-6 flex gap-3">
           <button
             onClick={handleAccept}

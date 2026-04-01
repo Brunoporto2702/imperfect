@@ -1,14 +1,19 @@
-import { FoodEntry } from "../models/food";
+import { randomUUID } from "crypto";
+import type { IntakeEntry, IntakeItem } from "../models/food";
 
-export function computeTotals(
-  entry: Omit<FoodEntry, "totalCaloriesMin" | "totalCaloriesMax" | "totalProtein">
-): FoodEntry {
-  return {
-    ...entry,
-    totalCaloriesMin: entry.items.reduce((sum, item) => sum + item.caloriesMin, 0),
-    totalCaloriesMax: entry.items.reduce((sum, item) => sum + item.caloriesMax, 0),
-    totalProtein: entry.items.every((item) => item.protein == null)
-      ? undefined
-      : entry.items.reduce((sum, item) => sum + (item.protein ?? 0), 0),
-  };
+export function buildIntakeItems(intakeEntry: IntakeEntry): IntakeItem[] {
+  return intakeEntry.parsedItems.map((item) => ({
+    id: randomUUID(),
+    name: item.name,
+    quantity: item.quantity,
+    caloriesMin: item.caloriesMin,
+    caloriesMax: item.caloriesMax,
+    protein: item.protein,
+    consumedAt: intakeEntry.createdAt,
+    source: "ai" as const,
+    processingId: intakeEntry.id,
+    editedByUser: false,
+    createdAt: intakeEntry.createdAt,
+    updatedAt: intakeEntry.createdAt,
+  }));
 }

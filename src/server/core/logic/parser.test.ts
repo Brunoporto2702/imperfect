@@ -33,18 +33,25 @@ describe("parseAIResponse", () => {
     confidence: "high",
   };
 
-  it("returns a correctly shaped entry for valid JSON", () => {
+  it("returns a correctly shaped IntakeEntry for valid JSON", () => {
     const result = parseAIResponse(JSON.stringify(validPayload), "two eggs");
-    expect(result.rawInput).toBe("two eggs");
-    expect(result.items).toHaveLength(1);
+    expect(result.inputText).toBe("two eggs");
+    expect(result.parsedItems).toHaveLength(1);
     expect(result.confidence).toBe("high");
     expect(typeof result.id).toBe("string");
-    expect(result.createdAt).toBeInstanceOf(Date);
+    expect(typeof result.createdAt).toBe("string");
+    expect(() => new Date(result.createdAt)).not.toThrow();
   });
 
-  it("preserves optional protein on items", () => {
+  it("stores the raw AI output in outputText", () => {
+    const raw = JSON.stringify(validPayload);
+    const result = parseAIResponse(raw, "two eggs");
+    expect(result.outputText).toBe(raw);
+  });
+
+  it("preserves optional protein on parsedItems", () => {
     const result = parseAIResponse(JSON.stringify(validPayload), "two eggs");
-    expect(result.items[0].protein).toBe(12);
+    expect(result.parsedItems[0].protein).toBe(12);
   });
 
   it("leaves protein undefined when omitted from items", () => {
@@ -53,7 +60,7 @@ describe("parseAIResponse", () => {
       confidence: "medium",
     };
     const result = parseAIResponse(JSON.stringify(payload), "rice");
-    expect(result.items[0].protein).toBeUndefined();
+    expect(result.parsedItems[0].protein).toBeUndefined();
   });
 
   it("throws when AI returns plain text instead of JSON", () => {

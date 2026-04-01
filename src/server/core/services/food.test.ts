@@ -10,15 +10,34 @@ const validAIResponse = JSON.stringify({
 });
 
 describe("createEntry", () => {
-  it("returns a FoodEntry with computed totals", async () => {
+  it("returns an IntakeEntry and IntakeItem[]", async () => {
     const provider: AIProvider = vi.fn().mockResolvedValue(validAIResponse);
 
-    const result = await createEntry("two eggs", provider);
+    const { intakeEntry, intakeItems } = await createEntry("two eggs", provider);
 
-    expect(result.totalCaloriesMin).toBe(140);
-    expect(result.totalCaloriesMax).toBe(200);
-    expect(result.totalProtein).toBe(12);
-    expect(result.confidence).toBe("high");
+    expect(intakeEntry.inputText).toBe("two eggs");
+    expect(intakeEntry.confidence).toBe("high");
+    expect(intakeEntry.parsedItems).toHaveLength(1);
+    expect(intakeItems).toHaveLength(1);
+  });
+
+  it("intakeItems carry calorie and protein values from parsedItems", async () => {
+    const provider: AIProvider = vi.fn().mockResolvedValue(validAIResponse);
+
+    const { intakeItems } = await createEntry("two eggs", provider);
+    const [item] = intakeItems;
+
+    expect(item.caloriesMin).toBe(140);
+    expect(item.caloriesMax).toBe(200);
+    expect(item.protein).toBe(12);
+  });
+
+  it("intakeItems are linked to the intakeEntry via processingId", async () => {
+    const provider: AIProvider = vi.fn().mockResolvedValue(validAIResponse);
+
+    const { intakeEntry, intakeItems } = await createEntry("two eggs", provider);
+
+    expect(intakeItems[0].processingId).toBe(intakeEntry.id);
   });
 
   it("calls the provider with the prepared prompt", async () => {
@@ -42,7 +61,7 @@ describe("createEntry", () => {
     await expect(createEntry("two eggs", provider)).rejects.toThrow("AI returned non-JSON response");
   });
 
-  it("omits totalProtein when no items have protein", async () => {
+  it("leaves protein undefined on items when not in AI response", async () => {
     const provider: AIProvider = vi.fn().mockResolvedValue(
       JSON.stringify({
         items: [{ name: "rice", quantity: "1 cup", caloriesMin: 200, caloriesMax: 250 }],
@@ -50,7 +69,7 @@ describe("createEntry", () => {
       })
     );
 
-    const result = await createEntry("rice", provider);
-    expect(result.totalProtein).toBeUndefined();
+    const { intakeItems } = await createEntry("rice", provider);
+    expect(intakeItems[0].protein).toBeUndefined();
   });
 });
