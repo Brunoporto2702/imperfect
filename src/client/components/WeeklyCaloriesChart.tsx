@@ -21,8 +21,14 @@ function computeTicks(maxVal: number): number[] {
   return [interval, interval * 2].filter((t) => t > 0 && t < maxVal);
 }
 
-export function WeeklyCaloriesChart({ days }: { days: DayBar[] }) {
-  const maxVal = Math.max(...days.map((d) => d.calMax), 1);
+export function WeeklyCaloriesChart({
+  days,
+  target,
+}: {
+  days: DayBar[];
+  target?: number;
+}) {
+  const maxVal = Math.max(...days.map((d) => d.calMax), target ?? 0, 1);
   const ticks = computeTicks(maxVal);
 
   const activeDays = days.filter((d) => d.calMax > 0);
@@ -83,6 +89,19 @@ export function WeeklyCaloriesChart({ days }: { days: DayBar[] }) {
             strokeWidth={1}
             strokeDasharray="3 3"
             className="stroke-zinc-400"
+          />
+        )}
+
+        {/* daily target line */}
+        {target != null && (
+          <line
+            x1={LEFT_PADDING}
+            y1={toY(target)}
+            x2={RIGHT_LABEL_START - 4}
+            y2={toY(target)}
+            strokeWidth={1.25}
+            strokeDasharray="4 2"
+            className="stroke-blue-400"
           />
         )}
 
@@ -176,6 +195,19 @@ export function WeeklyCaloriesChart({ days }: { days: DayBar[] }) {
               />
             </svg>
             <span className="text-[10px] text-zinc-400">weekly avg</span>
+          </div>
+        )}
+        {target != null && (
+          <div className="flex items-center gap-1.5">
+            <svg width="12" height="8">
+              <line
+                x1="0" y1="4" x2="12" y2="4"
+                strokeDasharray="3 2"
+                strokeWidth="1.25"
+                className="stroke-blue-400"
+              />
+            </svg>
+            <span className="text-[10px] text-blue-400">target</span>
           </div>
         )}
       </div>
