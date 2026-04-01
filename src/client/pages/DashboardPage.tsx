@@ -5,12 +5,17 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import type { IntakeEntry, IntakeItem } from "@/server/core/models/food";
 import { loadIntakeEntries } from "@/client/features/entries/intakeEntries";
-import { loadIntakeItems, deleteIntakeItemsByProcessingId } from "@/client/features/entries/intakeItems";
+import { loadIntakeItems } from "@/client/features/entries/intakeItems";
 import { loadTarget, saveTarget } from "@/client/features/profile/target";
-import { getWeeklyStats } from "@/client/logic/entries";
+import { getWeeklyStats, getDaySummaries, getWeeklyInsight } from "@/client/logic/entries";
 import { buildWeeklyChart } from "@/client/logic/chart";
-import { EntryCard } from "@/client/components/EntryCard";
 import { WeeklyCaloriesChart } from "@/client/components/WeeklyCaloriesChart";
+
+const SENTIMENT_STYLES = {
+  positive: "text-green-600",
+  warning: "text-amber-500",
+  neutral: "text-zinc-400",
+};
 
 export function DashboardPage() {
   const [entries, setEntries] = useState<IntakeEntry[]>([]);
@@ -28,12 +33,6 @@ export function DashboardPage() {
     setTargetInput(stored != null ? String(stored) : "");
   }, []);
 
-  function handleDelete(processingId: string) {
-    deleteIntakeItemsByProcessingId(processingId);
-    setEntries((prev) => prev.filter((e) => e.id !== processingId));
-    setItems((prev) => prev.filter((item) => item.processingId !== processingId));
-  }
-
   function handleTargetBlur() {
     const parsed = parseInt(targetInput, 10);
     if (!targetInput.trim() || isNaN(parsed) || parsed <= 0) {
@@ -47,7 +46,9 @@ export function DashboardPage() {
   }
 
   const weekly = getWeeklyStats(items);
+  const insight = getWeeklyInsight(items, target);
   const chartDays = buildWeeklyChart(items);
+  const daySummaries = getDaySummaries(items);
 
   return (
     <main className="w-full max-w-xl mx-auto p-8 pb-28">
@@ -63,6 +64,7 @@ export function DashboardPage() {
           </button>
         </div>
       )}
+
       <h1 className="text-2xl font-bold mb-6">Imperfect</h1>
 
       {entries.length === 0 ? (
@@ -81,15 +83,14 @@ export function DashboardPage() {
         </div>
       ) : (
         <>
+          {/* Weekly stats + insight */}
           <div className="border rounded-lg p-5 mb-8">
             <h2 className="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-4">
               This week
             </h2>
-            <div className="flex gap-8">
+            <div className="flex gap-8 mb-4">
               <div>
-                <p className="text-xl font-semibold">
-                  {weekly.calMin}–{weekly.calMax}
-                </p>
+                <p className="text-xl font-semibold">{weekly.calMin}–{weekly.calMax}</p>
                 <p className="text-xs text-zinc-500 mt-0.5">kcal</p>
               </div>
               {weekly.protein > 0 && (
@@ -100,11 +101,15 @@ export function DashboardPage() {
               )}
               <div>
                 <p className="text-xl font-semibold">{weekly.count}</p>
-                <p className="text-xs text-zinc-500 mt-0.5">entries</p>
+                <p className="text-xs text-zinc-500 mt-0.5">items</p>
               </div>
             </div>
+            <p className={`text-xs ${SENTIMENT_STYLES[insight.sentiment]}`}>
+              {insight.message}
+            </p>
           </div>
 
+          {/* Chart */}
           <div className="px-1 mb-8">
             <div className="flex items-center justify-between mb-3">
               <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide">
@@ -129,15 +134,30 @@ export function DashboardPage() {
             <WeeklyCaloriesChart days={chartDays} target={target ?? undefined} />
           </div>
 
-          <div className="flex flex-col gap-4">
-            <h2 className="text-sm font-medium text-zinc-500">History</h2>
-            {entries.map((entry) => (
-              <EntryCard
-                key={entry.id}
-                entry={entry}
-                items={items.filter((item) => item.processingId === entry.id)}
-                onDelete={handleDelete}
-              />
+          {/* Day summaries */}
+          <div className="flex flex-col gap-6">
+            {daySummaries.map((day) => (
+              <div key={day.dateKey}>
+                <div className="flex items-baseline justify-between mb-2">
+                  <span className="text-sm font-semibold">{day.label}</span>
+                  <span className="text-xs text-zinc-400">
+                    {day.calMin}–{day.calMax} kcal
+                  </span>
+                </div>
+                <ul className="flex flex-col gap-1">
+                  {day.items.map((item) => (
+                    <li key={item.id} className="flex items-baseline justify-between text-sm">
+                      <span className="text-zinc-700">
+                        {item.quantity} {item.name}
+                      </span>
+                      <span className="text-xs text-zinc-400 ml-4 shrink-0">
+                        {item.caloriesMin}–{item.caloriesMax} kcal
+                        {item.protein != null && ` · ${item.protein}g`}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))}
           </div>
         </>
