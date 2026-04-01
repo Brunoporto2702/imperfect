@@ -1,25 +1,37 @@
 import { z } from "zod";
 
-export const FoodItemSchema = z.object({
-  name: z.string(),
-  quantity: z.string(),
-  caloriesMin: z.number(),
-  caloriesMax: z.number(),
-  protein: z.number().optional(),
+export const ParsedItemSchema = z.object({
+  name: z.string().min(1),
+  quantity: z.string().min(1),
+  caloriesMin: z.number().nonnegative(),
+  caloriesMax: z.number().nonnegative(),
+  protein: z.number().nonnegative().optional(),
 });
 
-export type FoodItem = z.infer<typeof FoodItemSchema>;
-
-export const FoodEntrySchema = z.object({
+export const IntakeEntrySchema = z.object({
   id: z.string(),
-  createdAt: z.coerce.date(),
-  rawInput: z.string(),
-  imageUrl: z.string().optional(),
-  items: z.array(FoodItemSchema),
-  totalCaloriesMin: z.number(),
-  totalCaloriesMax: z.number(),
-  totalProtein: z.number().optional(),
+  inputText: z.string().min(1),
+  outputText: z.string().optional(),
   confidence: z.enum(["low", "medium", "high"]),
+  parsedItems: z.array(ParsedItemSchema),
+  createdAt: z.string().datetime(),
 });
 
-export type FoodEntry = z.infer<typeof FoodEntrySchema>;
+export const IntakeItemSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1),
+  quantity: z.string().min(1),
+  caloriesMin: z.number().nonnegative(),
+  caloriesMax: z.number().nonnegative(),
+  protein: z.number().nonnegative().optional(),
+  consumedAt: z.string().datetime(),
+  source: z.enum(["ai", "manual"]),
+  processingId: z.string().optional(),
+  editedByUser: z.boolean().default(false),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+});
+
+export type ParsedItem = z.infer<typeof ParsedItemSchema>;
+export type IntakeEntry = z.infer<typeof IntakeEntrySchema>;
+export type IntakeItem = z.infer<typeof IntakeItemSchema>;

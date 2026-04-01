@@ -1,10 +1,9 @@
 import { z } from "zod";
-import { FoodItemSchema } from "./food";
+import { ParsedItemSchema } from "./food";
 
-// AI response schema — excludes server-generated fields (id, createdAt, rawInput)
-// and computed fields (totalCaloriesMin, totalCaloriesMax, totalProtein)
+// Temporary — will be replaced by dto/ai.ts in the next commit
 export const AiResponseSchema = z.object({
-  items: z.array(FoodItemSchema),
+  items: z.array(ParsedItemSchema),
   confidence: z.enum(["low", "medium", "high"]),
 });
 
