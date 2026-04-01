@@ -1,10 +1,20 @@
 import { AIProvider, parseAIResponse } from "../logic/parser";
-import { FoodEntry } from "../models/food";
+import { buildIntakeItems } from "../logic/food";
 import { buildPrompt } from "../logic/prompt";
-import { computeTotals } from "../logic/food";
+import type { IntakeEntry, IntakeItem } from "../models/food";
 
-export async function createEntry(rawInput: string, provider: AIProvider): Promise<FoodEntry> {
-  const rawText = await provider(buildPrompt(rawInput));
-  const parsed = parseAIResponse(rawText, rawInput);
-  return computeTotals(parsed);
+export type CreateEntryResult = {
+  intakeEntry: IntakeEntry;
+  intakeItems: IntakeItem[];
+};
+
+export async function createEntry(
+  rawInput: string,
+  provider: AIProvider
+): Promise<CreateEntryResult> {
+  const prompt = buildPrompt(rawInput);
+  const rawText = await provider(prompt);
+  const intakeEntry = parseAIResponse(rawText, rawInput);
+  const intakeItems = buildIntakeItems(intakeEntry);
+  return { intakeEntry, intakeItems };
 }

@@ -19,7 +19,7 @@ function makeRequest(body: unknown) {
 }
 
 describe("POST handler", () => {
-  it("returns 200 with a complete FoodEntry on success", async () => {
+  it("returns 200 with intakeEntry and intakeItems on success", async () => {
     const provider: AIProvider = vi.fn().mockResolvedValue(validAIResponse);
     const POST = createHandler(provider);
 
@@ -27,10 +27,13 @@ describe("POST handler", () => {
     expect(res.status).toBe(200);
 
     const body = await res.json();
-    expect(body.rawInput).toBe("two eggs");
-    expect(body.totalCaloriesMin).toBe(140);
-    expect(body.totalCaloriesMax).toBe(200);
-    expect(body.totalProtein).toBe(12);
+    expect(body.intakeEntry.inputText).toBe("two eggs");
+    expect(body.intakeEntry.confidence).toBe("high");
+    expect(body.intakeItems).toHaveLength(1);
+    expect(body.intakeItems[0].caloriesMin).toBe(140);
+    expect(body.intakeItems[0].caloriesMax).toBe(200);
+    expect(body.intakeItems[0].protein).toBe(12);
+    expect(body.intakeItems[0].processingId).toBe(body.intakeEntry.id);
   });
 
   it("returns 400 and does not call provider when rawInput is empty", async () => {
