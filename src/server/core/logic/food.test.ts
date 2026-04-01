@@ -1,60 +1,80 @@
 import { describe, it, expect } from "vitest";
-import { computeTotals } from "./food";
-import type { FoodEntry } from "../models/food";
+import { buildIntakeItems } from "./food";
+import type { IntakeEntry } from "../models/food";
 
-const baseEntry: Omit<FoodEntry, "totalCaloriesMin" | "totalCaloriesMax" | "totalProtein"> = {
-  id: "test-id",
-  createdAt: new Date("2024-01-01"),
-  rawInput: "two eggs",
-  items: [
+const baseEntry: IntakeEntry = {
+  id: "entry-1",
+  inputText: "two eggs",
+  outputText: '{"items":[],"confidence":"high"}',
+  confidence: "high",
+  parsedItems: [
     { name: "scrambled eggs", quantity: "2 eggs", caloriesMin: 140, caloriesMax: 200, protein: 12 },
   ],
-  confidence: "high",
+  createdAt: "2024-01-01T12:00:00.000Z",
 };
 
-describe("computeTotals", () => {
-  it("sums calorie ranges across all items", () => {
-    const entry = {
+describe("buildIntakeItems", () => {
+  it("returns one IntakeItem per parsedItem", () => {
+    const items = buildIntakeItems(baseEntry);
+    expect(items).toHaveLength(1);
+  });
+
+  it("maps name, quantity, and calorie range correctly", () => {
+    const [item] = buildIntakeItems(baseEntry);
+    expect(item.name).toBe("scrambled eggs");
+    expect(item.quantity).toBe("2 eggs");
+    expect(item.caloriesMin).toBe(140);
+    expect(item.caloriesMax).toBe(200);
+  });
+
+  it("preserves optional protein", () => {
+    const [item] = buildIntakeItems(baseEntry);
+    expect(item.protein).toBe(12);
+  });
+
+  it("leaves protein undefined when omitted from parsedItem", () => {
+    const entry: IntakeEntry = {
       ...baseEntry,
-      items: [
-        { name: "egg", quantity: "1", caloriesMin: 70, caloriesMax: 90, protein: 6 },
-        { name: "toast", quantity: "1 slice", caloriesMin: 80, caloriesMax: 100, protein: 3 },
-      ],
+      parsedItems: [{ name: "rice", quantity: "1 cup", caloriesMin: 200, caloriesMax: 250 }],
     };
-    const result = computeTotals(entry);
-    expect(result.totalCaloriesMin).toBe(150);
-    expect(result.totalCaloriesMax).toBe(190);
+    const [item] = buildIntakeItems(entry);
+    expect(item.protein).toBeUndefined();
   });
 
-  it("sums protein when all items have it", () => {
-    const result = computeTotals(baseEntry);
-    expect(result.totalProtein).toBe(12);
+  it("sets source to ai", () => {
+    const [item] = buildIntakeItems(baseEntry);
+    expect(item.source).toBe("ai");
   });
 
-  it("sums protein treating items without protein as 0", () => {
-    const entry = {
+  it("links processingId to the IntakeEntry id", () => {
+    const [item] = buildIntakeItems(baseEntry);
+    expect(item.processingId).toBe("entry-1");
+  });
+
+  it("sets consumedAt to the entry createdAt", () => {
+    const [item] = buildIntakeItems(baseEntry);
+    expect(item.consumedAt).toBe(baseEntry.createdAt);
+  });
+
+  it("defaults editedByUser to false", () => {
+    const [item] = buildIntakeItems(baseEntry);
+    expect(item.editedByUser).toBe(false);
+  });
+
+  it("assigns unique ids to each item", () => {
+    const entry: IntakeEntry = {
       ...baseEntry,
-      items: [
-        { name: "egg", quantity: "1", caloriesMin: 70, caloriesMax: 90, protein: 6 },
+      parsedItems: [
+        { name: "egg", quantity: "1", caloriesMin: 70, caloriesMax: 90 },
         { name: "toast", quantity: "1 slice", caloriesMin: 80, caloriesMax: 100 },
       ],
     };
-    const result = computeTotals(entry);
-    expect(result.totalProtein).toBe(6);
+    const items = buildIntakeItems(entry);
+    expect(items[0].id).not.toBe(items[1].id);
   });
 
-  it("returns undefined totalProtein when no items have protein", () => {
-    const entry = {
-      ...baseEntry,
-      items: [{ name: "rice", quantity: "1 cup", caloriesMin: 200, caloriesMax: 250 }],
-    };
-    expect(computeTotals(entry).totalProtein).toBeUndefined();
-  });
-
-  it("handles an empty items array", () => {
-    const result = computeTotals({ ...baseEntry, items: [] });
-    expect(result.totalCaloriesMin).toBe(0);
-    expect(result.totalCaloriesMax).toBe(0);
-    expect(result.totalProtein).toBeUndefined();
+  it("returns an empty array for an entry with no parsedItems", () => {
+    const entry: IntakeEntry = { ...baseEntry, parsedItems: [] };
+    expect(buildIntakeItems(entry)).toHaveLength(0);
   });
 });

@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
-import { AiResponseSchema } from "../models/ai";
-import { FoodEntry } from "../models/food";
+import { AiResponseDtoSchema } from "../dto/ai";
+import type { IntakeEntry } from "../models/food";
 
 export type AIProvider = (message: string) => Promise<string>;
 
@@ -11,10 +11,7 @@ export function sanitizeInput(input: string): string {
   return output;
 }
 
-export function parseAIResponse(
-  rawText: string,
-  rawInput: string
-): Omit<FoodEntry, "totalCaloriesMin" | "totalCaloriesMax" | "totalProtein"> {
+export function parseAIResponse(rawText: string, inputText: string): IntakeEntry {
   const text = sanitizeInput(rawText);
 
   let parsed: unknown;
@@ -24,12 +21,15 @@ export function parseAIResponse(
     throw new Error(`AI returned non-JSON response: ${text.slice(0, 200)}`);
   }
 
-  const validated = AiResponseSchema.parse(parsed);
+  const dto = AiResponseDtoSchema.parse(parsed);
+  const now = new Date().toISOString();
 
   return {
     id: randomUUID(),
-    createdAt: new Date(),
-    rawInput,
-    ...validated,
+    inputText,
+    outputText: rawText,
+    confidence: dto.confidence,
+    parsedItems: dto.items,
+    createdAt: now,
   };
 }
