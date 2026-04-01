@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import type { FoodEntry } from "@/server/core/models/food";
 import { loadHistory, deleteEntry } from "@/client/features/entries/history";
-import { loadTarget, saveTarget } from "@/client/features/entries/target";
+import { loadTarget, saveTarget } from "@/client/features/profile/target";
 import { getWeeklyStats } from "@/client/logic/entries";
 import { buildWeeklyChart } from "@/client/logic/chart";
 import { EntryCard } from "@/client/components/EntryCard";
