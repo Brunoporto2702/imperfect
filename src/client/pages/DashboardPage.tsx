@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import type { IntakeEntry, IntakeItem } from "@/server/core/models/food";
 import { loadIntakeEntries } from "@/client/features/entries/intakeEntries";
@@ -20,8 +19,6 @@ const SENTIMENT_STYLES = {
 export function DashboardPage() {
   const [entries, setEntries] = useState<IntakeEntry[]>([]);
   const [items, setItems] = useState<IntakeItem[]>([]);
-  const searchParams = useSearchParams();
-  const [savedBanner, setSavedBanner] = useState(searchParams.get("saved") === "1");
   const [target, setTarget] = useState<number | null>(null);
   const [targetInput, setTargetInput] = useState("");
 
@@ -52,19 +49,6 @@ export function DashboardPage() {
 
   return (
     <main className="w-full max-w-xl mx-auto p-8 pb-28">
-      {savedBanner && (
-        <div className="flex items-center justify-between bg-green-50 border border-green-200 text-green-800 text-sm rounded px-4 py-2.5 mb-6">
-          <span>Entry saved.</span>
-          <button
-            onClick={() => setSavedBanner(false)}
-            className="text-green-600 hover:text-green-800 ml-4 text-base leading-none"
-            aria-label="Dismiss"
-          >
-            ×
-          </button>
-        </div>
-      )}
-
       {entries.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center gap-4">
           <p className="text-4xl">🍽️</p>

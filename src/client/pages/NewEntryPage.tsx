@@ -7,10 +7,12 @@ import type { IntakeEntry, IntakeItem } from "@/server/core/models/food";
 import { createEntry } from "@/client/features/entries/api";
 import { addIntakeEntry } from "@/client/features/entries/intakeEntries";
 import { addIntakeItems } from "@/client/features/entries/intakeItems";
+import { useToast } from "@/client/infra/toast";
 import { EntryCard } from "@/client/components/EntryCard";
 
 export function NewEntryPage() {
   const router = useRouter();
+  const { showToast } = useToast();
   const [rawInput, setRawInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -35,7 +37,8 @@ export function NewEntryPage() {
     if (!preview) return;
     addIntakeEntry(preview.entry);
     addIntakeItems(preview.items);
-    router.push("/?saved=1");
+    showToast("Entry saved.");
+    router.push("/");
   }
 
   function handleDiscard() {
