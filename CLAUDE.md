@@ -21,7 +21,7 @@ npm test          # Vitest (unit + integration)
 
 ## Tech Stack (fixed — do not change)
 
-- **Frontend**: Next.js (App Router)
+- **Frontend**: Next.js 16 (App Router)
 - **Backend**: Next.js API routes
 - **Validation**: Zod (all AI responses must be validated with Zod)
 - **Testing**: Vitest
@@ -35,71 +35,101 @@ Ports and adapters on the backend. Feature-Sliced Design on the frontend.
 ```
 src/
   app/
-    page.tsx                          # / — renders DashboardPage
-    new/page.tsx                      # /new — renders NewEntryPage
-    api/entries/route.ts              # POST /api/entries — wires provider, delegates to service
+    page.tsx                              # / — renders DashboardPage
+    new/page.tsx                          # /new — renders NewEntryPage
+    items/page.tsx                        # /items — renders ItemsPage
+    items/[id]/page.tsx                   # /items/[id] — renders EditItemPage
+    log/page.tsx                          # /log — renders LogPage
+    api/entries/route.ts                  # POST /api/entries — wires provider, delegates to service
 
   server/
-    core/                             # Domain — no framework dependencies
+    core/                                 # Domain — no framework dependencies
       models/
-        food.ts                       # FoodItemSchema, FoodEntrySchema, types
-        ai.ts                         # AiResponseSchema
-        entry.ts                      # CreateEntryRequestSchema
+        food.ts                           # IntakeEntrySchema, IntakeItemSchema, ParsedItemSchema, types
+        entry.ts                          # CreateEntryRequestSchema
+      dto/
+        ai.ts                             # AiResponseDtoSchema — wire shape from AI provider
       logic/
-        prompt.ts                     # PROMPT + buildPrompt(rawInput)
-        parser.ts                     # AIProvider port + sanitizeInput + parseAIResponse
-        food.ts                       # computeTotals (pure function)
+        prompt.ts                         # PROMPT + buildPrompt(rawInput)
+        parser.ts                         # AIProvider port + sanitizeInput + parseAIResponse → IntakeEntry
+        food.ts                           # buildIntakeItems(IntakeEntry) → IntakeItem[]
       services/
-        food.ts                       # createEntry(rawInput, provider) — plain function
+        food.ts                           # createEntry(rawInput, provider) → { intakeEntry, intakeItems }
     providers/
-      ai.anthropic.ts                 # Anthropic adapter implementing AIProvider
+      ai.anthropic.ts                     # Anthropic adapter implementing AIProvider
 
   client/
     infra/
-      http.ts                         # Generic fetch wrapper
-      storage.ts                      # Generic localStorage wrapper
+      http.ts                             # Generic fetch wrapper
+      storage.ts                          # Generic localStorage wrapper
+      toast.tsx                           # ToastContext + useToast hook + ToastProvider
     features/
       entries/
-        api.ts                        # createEntry(rawInput) — calls POST /api/entries
-        history.ts                    # loadHistory / saveHistory — uses storage infra
+        api.ts                            # createEntry(rawInput) → { intakeEntry, intakeItems }
+        intakeEntries.ts                  # load / save / add IntakeEntry[] (append-only)
+        intakeItems.ts                    # load / save / add / delete / update IntakeItem[]
+      profile/
+        target.ts                         # loadTarget / saveTarget — daily kcal target
     logic/
-      entries.ts                      # getWeeklyStats — pure calculations over FoodEntry[]
-      chart.ts                        # buildWeeklyChart + DayBar type — pure, FoodEntry[] → chart data
+      entries.ts                          # getWeeklyStats, getDaySummaries, getWeeklyInsight — pure, over IntakeItem[]
+      chart.ts                            # buildWeeklyChart + DayBar type — pure, IntakeItem[] → chart data
     pages/
-      DashboardPage.tsx               # Dashboard — weekly summary + chart + history + FAB
-      NewEntryPage.tsx                # New entry — form → AI preview → accept/discard
+      DashboardPage.tsx                   # Weekly stats + insight + chart + day summaries + FAB
+      NewEntryPage.tsx                    # Form → AI preview → accept/discard → toast + redirect
+      ItemsPage.tsx                       # Day-grouped IntakeItem list with edit + delete
+      EditItemPage.tsx                    # Edit single IntakeItem form
+      LogPage.tsx                         # Read-only IntakeEntry audit log (original AI output)
     components/
-      EntryCard.tsx                   # Reusable UI atom — shows rawInput, date, cal range, items
-      WeeklyCaloriesChart.tsx         # SVG box plot — daily calorie ranges + weekly avg reference line
+      Header.tsx                          # Global nav — logo + Items + Log links, active state
+      WeeklyCaloriesChart.tsx             # SVG box plot — daily cal ranges + optional target line
 ```
 
 Client layer rules:
 - **`logic/`** — pure functions over domain data. No framework dependencies, no side effects. Mirrors `server/core/logic/`.
 - **`pages/`** — page-level components: own layout, route logic, and business orchestration. Not reused across routes.
 - **`components/`** — reusable atoms with no route awareness or side effects.
+- **`infra/`** — generic wrappers. Know nothing about domain types.
+- **`features/`** — domain-aware storage and API. Compose infra.
 
 Core flow:
-user submits text → `NewEntryPage` → `features/entries/api` → POST /api/entries → `createEntry(rawInput, provider)` → `buildPrompt` → AI → `parseAIResponse` → `computeTotals` → previewed in UI → on accept: saved to localStorage → redirect to dashboard
+user submits text → `NewEntryPage` → `features/entries/api` → POST /api/entries → `createEntry(rawInput, provider)` → `buildPrompt` → AI → `parseAIResponse` → `buildIntakeItems` → previewed in UI → on accept: saved to localStorage (intakeEntries + intakeItems) → toast + redirect to dashboard
 
 ## Data Model (must follow exactly)
 
 ```ts
-FoodEntry {
+// Immutable AI interaction record
+IntakeEntry {
   id: string
-  createdAt: Date
-  rawInput: string
-  imageUrl?: string
-  items: Array<{
-    name: string
-    quantity: string
-    caloriesMin: number
-    caloriesMax: number
-    protein?: number
-  }>
-  totalCaloriesMin: number
-  totalCaloriesMax: number
-  totalProtein?: number
+  inputText: string
+  outputText?: string
   confidence: "low" | "medium" | "high"
+  parsedItems: ParsedItem[]             // original AI snapshot — never mutated
+  createdAt: string                     // ISO datetime
+}
+
+// AI-parsed item snapshot (lives inside IntakeEntry)
+ParsedItem {
+  name: string
+  quantity: string
+  caloriesMin: number
+  caloriesMax: number
+  protein?: number
+}
+
+// Atomic editable unit
+IntakeItem {
+  id: string
+  name: string
+  quantity: string
+  caloriesMin: number
+  caloriesMax: number
+  protein?: number
+  consumedAt: string                    // ISO datetime — the semantically meaningful date
+  source: "ai" | "manual"
+  processingId?: string                 // links back to IntakeEntry
+  editedByUser: boolean
+  createdAt: string                     // ISO datetime
+  updatedAt: string                     // ISO datetime
 }
 ```
 
@@ -108,14 +138,13 @@ FoodEntry {
 ```ts
 type CreateEntryRequest = {
   rawInput: string
-  imageUrl?: string
 }
 ```
 
 ## AI Parsing Rules
 
-- AI returns only `items` + `confidence` — totals are **never** part of the AI response
-- `computeTotals()` derives `totalCaloriesMin`, `totalCaloriesMax`, `totalProtein` from items
+- AI returns only `items` + `confidence` — validated via `AiResponseDtoSchema` at the provider boundary
+- `buildIntakeItems()` maps `ParsedItem[]` → `IntakeItem[]`, never the other way
 - Always return calorie **ranges** (min/max) per item — never a single exact number
 - Use reasonable portion assumptions when not specified
 - Prefer underconfidence over false precision
@@ -124,11 +153,14 @@ type CreateEntryRequest = {
 
 ## Architectural rules
 
-- **Providers are pure transport** — they receive a pre-built message string and return a raw string. No domain logic (no `buildPrompt`, no parsing) inside providers.
+- **Providers are pure transport** — they receive a pre-built message string and return a raw string. No domain logic inside providers.
 - **Core has no framework dependencies** — nothing in `server/core/` should import from Next.js or any provider.
 - **Services are plain functions** — `createEntry(rawInput, provider)` takes explicit dependencies, no factory needed.
 - **`createHandler(provider)`** in route.ts exists for controller-level testability only.
-- **Client infra is generic** — `http.ts` and `storage.ts` know nothing about entries. Features compose them.
+- **Client infra is generic** — `http.ts`, `storage.ts`, `toast.tsx` know nothing about domain types. Features compose them.
+- **`IntakeEntry` is append-only** — never mutated after creation. Edits happen only on `IntakeItem`.
+- **`dto/`** is the wire boundary — `AiResponseDto` is mapped to domain types in `logic/parser.ts`, never used beyond that layer.
+- **Dynamic route params in Next.js 16 are async** — always type as `Promise<{ id: string }>` and await in an async page component.
 
 ## Constraints
 
