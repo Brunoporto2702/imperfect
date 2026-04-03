@@ -2,7 +2,7 @@ import { z } from "zod";
 
 /**
  * Wire shape returned by the AI provider — validated at the boundary
- * before being mapped into domain types (ParsedItem[], confidence).
+ * before being mapped into domain types.
  */
 export const AiResponseDtoSchema = z.object({
   items: z.array(
@@ -14,7 +14,6 @@ export const AiResponseDtoSchema = z.object({
       protein: z.number().nonnegative().optional(),
     })
   ),
-  confidence: z.enum(["low", "medium", "high"]),
 });
 
 export type AiResponseDto = z.infer<typeof AiResponseDtoSchema>;

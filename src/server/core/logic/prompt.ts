@@ -11,7 +11,6 @@ example valid response:
       "protein": 12
     }
   ],
-  "confidence": "high"
 }
 
 example valid response for portuguese input "2 ovos mexidos":
@@ -24,8 +23,7 @@ example valid response for portuguese input "2 ovos mexidos":
       "caloriesMax": 200,
       "protein": 12
     }
-  ],
-  "confidence": "high"
+  ]
 }
 
 example valid response for portuguese input "200g de arroz":
@@ -38,8 +36,7 @@ example valid response for portuguese input "200g de arroz":
       "caloriesMax": 260,
       "protein": 4
     }
-  ],
-  "confidence": "high"
+  ]
 }
 
 example invalid response (don't return this):
@@ -54,8 +51,7 @@ example invalid response (don't return this):
       "caloriesMax": 200,
       "protein": 12
     }
-  ],
-  "confidence": "high"
+  ]
 }
 \`\`\`
 
@@ -69,14 +65,12 @@ JSON structure:
       "caloriesMax": number,
       "protein": number
     }
-  ],
-  "confidence": "low" | "medium" | "high"
+  ]
 }
 
 Rules:
 - Always use ranges (caloriesMin/caloriesMax), never exact values
 - Make reasonable portion assumptions when not specified
-- confidence: "high" = clearly described, "medium" = portions assumed, "low" = vague description
 - Omit protein if truly unknown
 - name: food item only, no quantity (e.g. "scrambled eggs", not "2 scrambled eggs")
 - quantity: amount/portion only (e.g. "2 large", "200g", "1 slice")

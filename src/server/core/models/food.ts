@@ -12,7 +12,6 @@ export const IntakeEntrySchema = z.object({
   id: z.string(),
   inputText: z.string().min(1),
   outputText: z.string().optional(),
-  confidence: z.enum(["low", "medium", "high"]),
   parsedItems: z.array(ParsedItemSchema),
   createdAt: z.string().datetime(),
 });

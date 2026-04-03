@@ -30,14 +30,12 @@ describe("parseAIResponse", () => {
     items: [
       { name: "scrambled eggs", quantity: "2 eggs", caloriesMin: 140, caloriesMax: 200, protein: 12 },
     ],
-    confidence: "high",
   };
 
   it("returns a correctly shaped IntakeEntry for valid JSON", () => {
     const result = parseAIResponse(JSON.stringify(validPayload), "two eggs");
     expect(result.inputText).toBe("two eggs");
     expect(result.parsedItems).toHaveLength(1);
-    expect(result.confidence).toBe("high");
     expect(typeof result.id).toBe("string");
     expect(typeof result.createdAt).toBe("string");
     expect(() => new Date(result.createdAt)).not.toThrow();
@@ -57,7 +55,6 @@ describe("parseAIResponse", () => {
   it("leaves protein undefined when omitted from items", () => {
     const payload = {
       items: [{ name: "rice", quantity: "1 cup", caloriesMin: 200, caloriesMax: 250 }],
-      confidence: "medium",
     };
     const result = parseAIResponse(JSON.stringify(payload), "rice");
     expect(result.parsedItems[0].protein).toBeUndefined();
@@ -70,13 +67,13 @@ describe("parseAIResponse", () => {
   });
 
   it("throws when JSON does not match the schema", () => {
-    const bad = { items: [], confidence: "very high" };
+    const bad = { items: [{ name: "", quantity: "1", caloriesMin: 0, caloriesMax: 0 }] };
     expect(() => parseAIResponse(JSON.stringify(bad), "two eggs")).toThrow();
   });
 
   it("handles JSON wrapped in markdown backticks", () => {
     const wrapped = "```json\n" + JSON.stringify(validPayload) + "\n```";
     const result = parseAIResponse(wrapped, "two eggs");
-    expect(result.confidence).toBe("high");
+    expect(result.parsedItems).toHaveLength(1);
   });
 });

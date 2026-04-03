@@ -6,7 +6,6 @@ const validAIResponse = JSON.stringify({
   items: [
     { name: "scrambled eggs", quantity: "2 eggs", caloriesMin: 140, caloriesMax: 200, protein: 12 },
   ],
-  confidence: "high",
 });
 
 describe("createEntry", () => {
@@ -16,7 +15,6 @@ describe("createEntry", () => {
     const { intakeEntry, intakeItems } = await createEntry("two eggs", provider);
 
     expect(intakeEntry.inputText).toBe("two eggs");
-    expect(intakeEntry.confidence).toBe("high");
     expect(intakeEntry.parsedItems).toHaveLength(1);
     expect(intakeItems).toHaveLength(1);
   });
@@ -65,7 +63,6 @@ describe("createEntry", () => {
     const provider: AIProvider = vi.fn().mockResolvedValue(
       JSON.stringify({
         items: [{ name: "rice", quantity: "1 cup", caloriesMin: 200, caloriesMax: 250 }],
-        confidence: "medium",
       })
     );
 

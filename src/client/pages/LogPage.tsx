@@ -13,11 +13,6 @@ function formatDate(iso: string): string {
     : d.toLocaleDateString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
 }
 
-const CONFIDENCE_STYLES: Record<string, string> = {
-  high: "text-green-600 bg-green-50",
-  medium: "text-amber-600 bg-amber-50",
-  low: "text-red-500 bg-red-50",
-};
 
 export function LogPage() {
   const [entries, setEntries] = useState<IntakeEntry[]>([]);
@@ -47,9 +42,6 @@ export function LogPage() {
               </div>
 
               <div className="flex items-center gap-2">
-                <span className={`text-xs px-2 py-0.5 rounded-full capitalize font-medium ${CONFIDENCE_STYLES[entry.confidence]}`}>
-                  {entry.confidence}
-                </span>
                 <span className="text-xs text-zinc-400">{entry.parsedItems.length} items parsed</span>
               </div>
 

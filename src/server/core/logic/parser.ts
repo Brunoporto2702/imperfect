@@ -28,7 +28,6 @@ export function parseAIResponse(rawText: string, inputText: string): IntakeEntry
     id: randomUUID(),
     inputText,
     outputText: rawText,
-    confidence: dto.confidence,
     parsedItems: dto.items,
     createdAt: now,
   };

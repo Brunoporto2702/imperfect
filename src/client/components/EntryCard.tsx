@@ -55,10 +55,9 @@ export function EntryCard({
         <span className="font-semibold text-lg">
           {totalCalMin}–{totalCalMax} kcal
         </span>
-        <div className="flex gap-3 text-sm text-zinc-500">
-          {totalProtein != null && <span>{totalProtein}g protein</span>}
-          <span className="capitalize">{entry.confidence} confidence</span>
-        </div>
+        {totalProtein != null && (
+          <span className="text-sm text-zinc-500">{totalProtein}g protein</span>
+        )}
       </div>
 
       <ul className="flex flex-col gap-1">

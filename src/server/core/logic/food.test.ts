@@ -5,8 +5,7 @@ import type { IntakeEntry } from "../models/food";
 const baseEntry: IntakeEntry = {
   id: "entry-1",
   inputText: "two eggs",
-  outputText: '{"items":[],"confidence":"high"}',
-  confidence: "high",
+  outputText: '{"items":[]}',
   parsedItems: [
     { name: "scrambled eggs", quantity: "2 eggs", caloriesMin: 140, caloriesMax: 200, protein: 12 },
   ],

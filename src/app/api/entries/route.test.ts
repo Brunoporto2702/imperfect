@@ -7,7 +7,6 @@ const validAIResponse = JSON.stringify({
   items: [
     { name: "scrambled eggs", quantity: "2 eggs", caloriesMin: 140, caloriesMax: 200, protein: 12 },
   ],
-  confidence: "high",
 });
 
 function makeRequest(body: unknown) {
@@ -28,7 +27,6 @@ describe("POST handler", () => {
 
     const body = await res.json();
     expect(body.intakeEntry.inputText).toBe("two eggs");
-    expect(body.intakeEntry.confidence).toBe("high");
     expect(body.intakeItems).toHaveLength(1);
     expect(body.intakeItems[0].caloriesMin).toBe(140);
     expect(body.intakeItems[0].caloriesMax).toBe(200);

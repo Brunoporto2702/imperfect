@@ -60,7 +60,6 @@ describe("IntakeEntrySchema", () => {
   const valid = {
     id: "entry-1",
     inputText: "two scrambled eggs",
-    confidence: "high",
     parsedItems: [],
     createdAt: "2024-01-01T12:00:00.000Z",
   };
@@ -72,16 +71,6 @@ describe("IntakeEntrySchema", () => {
   it("accepts optional outputText", () => {
     const result = IntakeEntrySchema.safeParse({ ...valid, outputText: '{"items":[]}' });
     expect(result.success).toBe(true);
-  });
-
-  it("accepts all confidence values", () => {
-    for (const confidence of ["low", "medium", "high"]) {
-      expect(IntakeEntrySchema.safeParse({ ...valid, confidence }).success).toBe(true);
-    }
-  });
-
-  it("rejects an invalid confidence value", () => {
-    expect(IntakeEntrySchema.safeParse({ ...valid, confidence: "very high" }).success).toBe(false);
   });
 
   it("rejects when inputText is empty", () => {
