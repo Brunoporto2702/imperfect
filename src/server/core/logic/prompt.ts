@@ -4,11 +4,39 @@ example valid response:
 {
   "items": [
     {
-      "name": "2 scrambled eggs",
-      "quantity": "2 eggs",
+      "name": "scrambled eggs",
+      "quantity": "2 large",
       "caloriesMin": 140,
       "caloriesMax": 200,
       "protein": 12
+    }
+  ],
+  "confidence": "high"
+}
+
+example valid response for portuguese input "2 ovos mexidos":
+{
+  "items": [
+    {
+      "name": "ovos mexidos",
+      "quantity": "2",
+      "caloriesMin": 140,
+      "caloriesMax": 200,
+      "protein": 12
+    }
+  ],
+  "confidence": "high"
+}
+
+example valid response for portuguese input "200g de arroz":
+{
+  "items": [
+    {
+      "name": "arroz",
+      "quantity": "200g",
+      "caloriesMin": 220,
+      "caloriesMax": 260,
+      "protein": 4
     }
   ],
   "confidence": "high"
@@ -49,7 +77,10 @@ Rules:
 - Always use ranges (caloriesMin/caloriesMax), never exact values
 - Make reasonable portion assumptions when not specified
 - confidence: "high" = clearly described, "medium" = portions assumed, "low" = vague description
-- Omit protein if truly unknown`;
+- Omit protein if truly unknown
+- name: food item only, no quantity (e.g. "scrambled eggs", not "2 scrambled eggs")
+- quantity: amount/portion only (e.g. "2 large", "200g", "1 slice")
+- respond in the same language as the input`;
 
 export function buildPrompt(rawInput: string): string {
   return `${PROMPT}\n\nFood description: ${rawInput}`;
