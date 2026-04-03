@@ -1,29 +1,47 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import type { IntakeEntry, IntakeItem } from "@/server/core/models/food";
 import { createEntry } from "@/client/features/entries/api";
 import { addIntakeEntry } from "@/client/features/entries/intakeEntries";
-import { addIntakeItems } from "@/client/features/entries/intakeItems";
+import { addIntakeItems, loadIntakeItems } from "@/client/features/entries/intakeItems";
 import { useToast } from "@/client/infra/toast";
 import { EntryCard } from "@/client/components/EntryCard";
+import { ItemInput } from "@/client/components/ItemInput";
 
 export function NewEntryPage() {
   const router = useRouter();
   const { showToast } = useToast();
-  const [rawInput, setRawInput] = useState("");
+  const [stagedItems, setStagedItems] = useState<string[]>([]);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [preview, setPreview] = useState<{ entry: IntakeEntry; items: IntakeItem[] } | null>(null);
 
+  useEffect(() => {
+    const existing = loadIntakeItems();
+    const unique = [...new Set(existing.map((i) => i.name))];
+    setSuggestions(unique);
+  }, []);
+
+  function handleAdd(text: string) {
+    setStagedItems((prev) => [...prev, text]);
+  }
+
+  function handleRemove(index: number) {
+    setStagedItems((prev) => prev.filter((_, i) => i !== index));
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (stagedItems.length === 0) return;
     setLoading(true);
     setError(null);
 
     try {
+      const rawInput = stagedItems.join("\n");
       const { intakeEntry, intakeItems } = await createEntry(rawInput);
       setPreview({ entry: intakeEntry, items: intakeItems });
     } catch (err) {
@@ -75,17 +93,28 @@ export function NewEntryPage() {
       </Link>
       <h1 className="text-2xl font-bold mb-6">New entry</h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-3 w-full">
-        <textarea
-          className="border rounded p-3 w-full min-h-[100px] resize-y text-sm"
-          placeholder='What did you eat? e.g. "two scrambled eggs and a slice of toast"'
-          value={rawInput}
-          onChange={(e) => setRawInput(e.target.value)}
-          disabled={loading}
-        />
+        <ItemInput onAdd={handleAdd} suggestions={suggestions} disabled={loading} />
+        {stagedItems.length > 0 && (
+          <ul className="flex flex-col gap-1 mt-1">
+            {stagedItems.map((item, i) => (
+              <li key={i} className="flex items-center justify-between border rounded px-3 py-2 text-sm">
+                <span>{item}</span>
+                <button
+                  type="button"
+                  onClick={() => handleRemove(i)}
+                  aria-label="Remove item"
+                  className="text-zinc-300 hover:text-red-500 transition-colors text-base leading-none ml-3"
+                >
+                  ×
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
         <button
           type="submit"
-          disabled={loading || !rawInput.trim()}
-          className="bg-black text-white rounded px-4 py-2 text-sm disabled:opacity-40"
+          disabled={loading || stagedItems.length === 0}
+          className="bg-black text-white rounded px-4 py-2 text-sm disabled:opacity-40 mt-1"
         >
           {loading ? "Analyzing..." : "Analyze"}
         </button>
