@@ -3,19 +3,31 @@
 import { useState, useRef, useEffect } from "react";
 
 type Props = {
-  onAdd: (text: string) => void;
+  onAdd: (name: string, qty: string) => void;
   suggestions: string[];
   disabled?: boolean;
 };
 
+const QTY_RE = /^(\d+(?:[.,]\d+)?\s*(?:g|kg|ml|l|dl|oz|lb|cups?|tbsp|tsp|x)?\s+)/i;
+
+function splitQty(text: string): { name: string; qty: string } {
+  const match = text.match(QTY_RE);
+  if (match) {
+    return { qty: match[1].trim(), name: text.slice(match[1].length).trim() };
+  }
+  return { name: text.trim(), qty: "" };
+}
+
 export function ItemInput({ onAdd, suggestions, disabled }: Props) {
-  const [value, setValue] = useState("");
+  const [name, setName] = useState("");
+  const [qty, setQty] = useState("");
   const [open, setOpen] = useState(false);
   const [highlighted, setHighlighted] = useState(-1);
   const containerRef = useRef<HTMLDivElement>(null);
+  const qtyRef = useRef<HTMLInputElement>(null);
 
   const filtered = (() => {
-    const trimmed = value.trim();
+    const trimmed = name.trim();
     if (!trimmed) return [];
     try {
       const re = new RegExp(trimmed, "i");
@@ -27,16 +39,34 @@ export function ItemInput({ onAdd, suggestions, disabled }: Props) {
 
   const showDropdown = open && filtered.length > 0;
 
-  function commit(text: string) {
-    const trimmed = text.trim();
-    if (!trimmed) return;
-    onAdd(trimmed);
-    setValue("");
+  function applyAutoSplit() {
+    const split = splitQty(name);
+    if (split.qty) {
+      setName(split.name);
+      setQty((prev) => prev || split.qty);
+    }
+  }
+
+  function commit() {
+    const trimmedName = name.trim();
+    if (!trimmedName) return;
+    onAdd(trimmedName, qty.trim());
+    setName("");
+    setQty("");
     setOpen(false);
     setHighlighted(-1);
   }
 
-  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+  function selectSuggestion(s: string) {
+    const split = splitQty(s);
+    setName(split.name);
+    if (split.qty) setQty((prev) => prev || split.qty);
+    setOpen(false);
+    setHighlighted(-1);
+    qtyRef.current?.focus();
+  }
+
+  function handleNameKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === "ArrowDown") {
       e.preventDefault();
       setHighlighted((h) => Math.min(h + 1, filtered.length - 1));
@@ -46,13 +76,21 @@ export function ItemInput({ onAdd, suggestions, disabled }: Props) {
     } else if (e.key === "Enter") {
       e.preventDefault();
       if (highlighted >= 0 && filtered[highlighted]) {
-        commit(filtered[highlighted]);
+        selectSuggestion(filtered[highlighted]);
       } else {
-        commit(value);
+        applyAutoSplit();
+        qtyRef.current?.focus();
       }
     } else if (e.key === "Escape") {
       setOpen(false);
       setHighlighted(-1);
+    }
+  }
+
+  function handleQtyKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      commit();
     }
   }
 
@@ -72,15 +110,16 @@ export function ItemInput({ onAdd, suggestions, disabled }: Props) {
         <input
           type="text"
           className="border rounded p-3 w-full text-sm"
-          placeholder='e.g. "2 scrambled eggs"'
-          value={value}
+          placeholder="Item name"
+          value={name}
           onChange={(e) => {
-            setValue(e.target.value);
+            setName(e.target.value);
             setOpen(true);
             setHighlighted(-1);
           }}
+          onBlur={applyAutoSplit}
           onFocus={() => setOpen(true)}
-          onKeyDown={handleKeyDown}
+          onKeyDown={handleNameKeyDown}
           disabled={disabled}
           autoComplete="off"
         />
@@ -94,7 +133,7 @@ export function ItemInput({ onAdd, suggestions, disabled }: Props) {
                 }`}
                 onMouseDown={(e) => {
                   e.preventDefault();
-                  commit(s);
+                  selectSuggestion(s);
                 }}
                 onMouseEnter={() => setHighlighted(i)}
               >
@@ -104,10 +143,21 @@ export function ItemInput({ onAdd, suggestions, disabled }: Props) {
           </ul>
         )}
       </div>
+      <input
+        ref={qtyRef}
+        type="text"
+        className="border rounded p-3 w-20 text-sm text-center"
+        placeholder="qty"
+        value={qty}
+        onChange={(e) => setQty(e.target.value)}
+        onKeyDown={handleQtyKeyDown}
+        disabled={disabled}
+        autoComplete="off"
+      />
       <button
         type="button"
-        onClick={() => commit(value)}
-        disabled={disabled || !value.trim()}
+        onClick={commit}
+        disabled={disabled || !name.trim()}
         className="bg-black text-white rounded px-4 py-2 text-sm disabled:opacity-40 shrink-0"
       >
         Add

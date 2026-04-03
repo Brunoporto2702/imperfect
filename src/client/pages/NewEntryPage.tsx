@@ -14,7 +14,7 @@ import { ItemInput } from "@/client/components/ItemInput";
 export function NewEntryPage() {
   const router = useRouter();
   const { showToast } = useToast();
-  const [stagedItems, setStagedItems] = useState<string[]>([]);
+  const [stagedItems, setStagedItems] = useState<{ name: string; qty: string }[]>([]);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,8 +26,12 @@ export function NewEntryPage() {
     setSuggestions(unique);
   }, []);
 
-  function handleAdd(text: string) {
-    setStagedItems((prev) => [...prev, text]);
+  function handleAdd(name: string, qty: string) {
+    setStagedItems((prev) => [...prev, { name, qty }]);
+  }
+
+  function handleUpdateQty(index: number, qty: string) {
+    setStagedItems((prev) => prev.map((item, i) => (i === index ? { ...item, qty } : item)));
   }
 
   function handleRemove(index: number) {
@@ -41,7 +45,9 @@ export function NewEntryPage() {
     setError(null);
 
     try {
-      const rawInput = stagedItems.join("\n");
+      const rawInput = stagedItems
+        .map((i) => (i.qty ? `${i.qty} ${i.name}` : i.name))
+        .join("\n");
       const { intakeEntry, intakeItems } = await createEntry(rawInput);
       setPreview({ entry: intakeEntry, items: intakeItems });
     } catch (err) {
@@ -97,13 +103,20 @@ export function NewEntryPage() {
         {stagedItems.length > 0 && (
           <ul className="flex flex-col gap-1 mt-1">
             {stagedItems.map((item, i) => (
-              <li key={i} className="flex items-center justify-between border rounded px-3 py-2 text-sm">
-                <span>{item}</span>
+              <li key={i} className="flex items-center gap-2 border rounded px-3 py-2 text-sm">
+                <span className="flex-1">{item.name}</span>
+                <input
+                  type="text"
+                  value={item.qty}
+                  onChange={(e) => handleUpdateQty(i, e.target.value)}
+                  placeholder="qty"
+                  className="border rounded px-2 py-1 w-16 text-xs text-center text-zinc-600"
+                />
                 <button
                   type="button"
                   onClick={() => handleRemove(i)}
                   aria-label="Remove item"
-                  className="text-zinc-300 hover:text-red-500 transition-colors text-base leading-none ml-3"
+                  className="text-zinc-300 hover:text-red-500 transition-colors text-base leading-none"
                 >
                   ×
                 </button>
