@@ -10,7 +10,7 @@ example valid response:
       "caloriesMax": 200,
       "protein": 12
     }
-  ],
+  ]
 }
 
 example valid response for portuguese input "2 ovos mexidos":

@@ -75,13 +75,14 @@ src/
       chart.ts                            # buildWeeklyChart + DayBar type — pure, IntakeItem[] → chart data
     pages/
       DashboardPage.tsx                   # Weekly stats + insight + chart + day summaries + FAB
-      NewEntryPage.tsx                    # Form → AI preview → accept/discard → toast + redirect
+      NewEntryPage.tsx                    # Item-by-item input → staged list → AI preview → accept/discard → toast + redirect
       ItemsPage.tsx                       # Day-grouped IntakeItem list with edit + delete
       EditItemPage.tsx                    # Edit single IntakeItem form
       LogPage.tsx                         # Read-only IntakeEntry audit log (original AI output)
     components/
       Header.tsx                          # Global nav — logo + Items + Log links, active state
       WeeklyCaloriesChart.tsx             # SVG box plot — daily cal ranges + optional target line
+      ItemInput.tsx                       # Autocomplete input + qty field + Add button (pure — receives suggestions as prop)
 ```
 
 Client layer rules:
@@ -92,7 +93,7 @@ Client layer rules:
 - **`features/`** — domain-aware storage and API. Compose infra.
 
 Core flow:
-user submits text → `NewEntryPage` → `features/entries/api` → POST /api/entries → `createEntry(rawInput, provider)` → `buildPrompt` → AI → `parseAIResponse` → `buildIntakeItems` → previewed in UI → on accept: saved to localStorage (intakeEntries + intakeItems) → toast + redirect to dashboard
+user adds items one-by-one (name + qty) → staged list in `NewEntryPage` → joined as `rawInput` → `features/entries/api` → POST /api/entries → `createEntry(rawInput, provider)` → `buildPrompt` → AI → `parseAIResponse` → `buildIntakeItems` → previewed in UI → on accept: saved to localStorage (intakeEntries + intakeItems) → toast + redirect to dashboard
 
 ## Data Model (must follow exactly)
 
@@ -102,7 +103,6 @@ IntakeEntry {
   id: string
   inputText: string
   outputText?: string
-  confidence: "low" | "medium" | "high"
   parsedItems: ParsedItem[]             // original AI snapshot — never mutated
   createdAt: string                     // ISO datetime
 }
@@ -143,13 +143,14 @@ type CreateEntryRequest = {
 
 ## AI Parsing Rules
 
-- AI returns only `items` + `confidence` — validated via `AiResponseDtoSchema` at the provider boundary
+- AI returns only `items` — validated via `AiResponseDtoSchema` at the provider boundary
 - `buildIntakeItems()` maps `ParsedItem[]` → `IntakeItem[]`, never the other way
 - Always return calorie **ranges** (min/max) per item — never a single exact number
 - Use reasonable portion assumptions when not specified
 - Prefer underconfidence over false precision
 - AI output must be structured JSON, validated via Zod before use
-- Prompt includes a valid/invalid example pair to reduce markdown-wrapped or plain-text responses
+- Prompt includes multiple few-shot examples (EN + PT) to anchor name/quantity separation and language matching
+- **few-shot examples carry more weight than rules** — if a rule isn't sticking, add a concrete example in the target language
 
 ## Architectural rules
 
