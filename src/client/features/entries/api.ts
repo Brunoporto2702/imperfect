@@ -13,3 +13,7 @@ export function createItemsEntry(rawInput: string): Promise<CreateEntryResponse>
 export function createImageEntry(imageDataUrl: string, description?: string): Promise<CreateEntryResponse> {
   return post<CreateEntryResponse>("/api/entries", { inputType: "image", imageDataUrl, description });
 }
+
+export function createTextEntry(rawInput: string): Promise<CreateEntryResponse> {
+  return post<CreateEntryResponse>("/api/entries", { inputType: "text", rawInput });
+}

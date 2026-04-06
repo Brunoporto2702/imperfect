@@ -83,6 +83,9 @@ export function buildPrompt(request: CreateEntryRequest): AIPayload {
   if (request.inputType === "items") {
     return { text: `${PROMPT}\n\nFood description: ${request.rawInput}` };
   }
+  if (request.inputType === "text") {
+    return { text: `${PROMPT}\n\nMeal description: ${request.rawInput}` };
+  }
   // inputType === "image"
   const instruction = request.description?.trim()
     ? `The user described this meal as: "${request.description}". Analyze the food visible in the image.`

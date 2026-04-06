@@ -155,6 +155,18 @@ describe("CreateEntryRequestSchema", () => {
     expect(CreateEntryRequestSchema.safeParse({ rawInput: "two eggs" }).success).toBe(false);
   });
 
+  it("accepts text input with rawInput", () => {
+    expect(
+      CreateEntryRequestSchema.safeParse({ inputType: "text", rawInput: "frango com arroz" }).success
+    ).toBe(true);
+  });
+
+  it("rejects text input with empty rawInput", () => {
+    expect(
+      CreateEntryRequestSchema.safeParse({ inputType: "text", rawInput: "" }).success
+    ).toBe(false);
+  });
+
   it("accepts image input with imageDataUrl", () => {
     expect(
       CreateEntryRequestSchema.safeParse({ inputType: "image", imageDataUrl: "data:image/jpeg;base64,abc" }).success

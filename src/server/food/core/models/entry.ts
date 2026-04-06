@@ -11,9 +11,15 @@ const ImageEntryRequestSchema = z.object({
   description: z.string().optional(),
 });
 
+const TextEntryRequestSchema = z.object({
+  inputType: z.literal("text"),
+  rawInput: z.string().min(1),
+});
+
 export const CreateEntryRequestSchema = z.discriminatedUnion("inputType", [
   ItemsEntryRequestSchema,
   ImageEntryRequestSchema,
+  TextEntryRequestSchema,
 ]);
 
 export type CreateEntryRequest = z.infer<typeof CreateEntryRequestSchema>;

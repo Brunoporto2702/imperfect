@@ -1,5 +1,42 @@
-import { NewEntryPage } from "@/client/pages/NewEntryPage";
+import Link from "next/link";
+
+const INPUT_TYPES = [
+  {
+    href: "/new/items",
+    title: "By items",
+    description: "Add each food item individually with name and quantity.",
+  },
+  {
+    href: "/new/text",
+    title: "Free text",
+    description: "Describe your meal in your own words, any language.",
+  },
+  {
+    href: "/new/image",
+    title: "Photo",
+    description: "Take a photo or upload an image of your meal.",
+  },
+];
 
 export default function Page() {
-  return <NewEntryPage />;
+  return (
+    <main className="w-full max-w-xl mx-auto p-8">
+      <Link href="/" className="text-sm text-zinc-400 hover:text-zinc-700 transition-colors mb-6 inline-block">
+        ← Back
+      </Link>
+      <h1 className="text-2xl font-bold mb-8">New entry</h1>
+      <div className="flex flex-col gap-4">
+        {INPUT_TYPES.map(({ href, title, description }) => (
+          <Link
+            key={href}
+            href={href}
+            className="border rounded-lg px-5 py-4 hover:border-zinc-400 hover:bg-zinc-50 transition-colors"
+          >
+            <p className="font-semibold text-sm">{title}</p>
+            <p className="text-sm text-zinc-500 mt-1">{description}</p>
+          </Link>
+        ))}
+      </div>
+    </main>
+  );
 }

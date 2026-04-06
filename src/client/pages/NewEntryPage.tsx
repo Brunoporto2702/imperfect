@@ -94,10 +94,10 @@ export function NewEntryPage() {
 
   return (
     <main className="w-full max-w-xl mx-auto p-8">
-      <Link href="/" className="text-sm text-zinc-400 hover:text-zinc-700 transition-colors mb-6 inline-block">
+      <Link href="/new" className="text-sm text-zinc-400 hover:text-zinc-700 transition-colors mb-6 inline-block">
         ← Back
       </Link>
-      <h1 className="text-2xl font-bold mb-6">New entry</h1>
+      <h1 className="text-2xl font-bold mb-6">By items</h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-3 w-full">
         <ItemInput onAdd={handleAdd} suggestions={suggestions} disabled={loading} />
         {stagedItems.length > 0 && (
@@ -131,9 +131,6 @@ export function NewEntryPage() {
         >
           {loading ? "Analyzing..." : "Analyze"}
         </button>
-        <Link href="/new/image" className="text-sm text-zinc-400 hover:text-zinc-600 text-center mt-1">
-          Try a different way →
-        </Link>
       </form>
       {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
     </main>

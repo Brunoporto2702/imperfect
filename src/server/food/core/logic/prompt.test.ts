@@ -19,6 +19,23 @@ describe("buildPrompt", () => {
     });
   });
 
+  describe("inputType: text", () => {
+    it("returns text containing the rawInput", () => {
+      const { text } = buildPrompt({ inputType: "text", rawInput: "hoje almocei frango com arroz" });
+      expect(text).toContain("hoje almocei frango com arroz");
+    });
+
+    it("does not include imageDataUrl", () => {
+      const payload = buildPrompt({ inputType: "text", rawInput: "salad and soup" });
+      expect(payload.imageDataUrl).toBeUndefined();
+    });
+
+    it("includes Meal description label", () => {
+      const { text } = buildPrompt({ inputType: "text", rawInput: "a bowl of oatmeal" });
+      expect(text).toContain("Meal description: a bowl of oatmeal");
+    });
+  });
+
   describe("inputType: image", () => {
     it("returns the imageDataUrl", () => {
       const { imageDataUrl } = buildPrompt({

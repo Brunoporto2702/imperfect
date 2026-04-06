@@ -18,9 +18,10 @@ export async function createEntry(
 ): Promise<CreateEntryResult> {
   const payload = buildPrompt(request);
   const rawText = await provider(payload);
-  const inputText = request.inputType === "items"
-    ? request.rawInput
-    : request.description ?? "[image]";
+  const inputText =
+    request.inputType === "items" || request.inputType === "text"
+      ? request.rawInput
+      : request.description ?? "[image]";
   const intakeEntry = parseAIResponse(rawText, inputText);
   const intakeItems = buildIntakeItems(intakeEntry);
   await EntryRepository.save(db, intakeEntry);

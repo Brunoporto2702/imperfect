@@ -108,7 +108,7 @@ export function NewImageEntryPage() {
       <Link href="/new" className="text-sm text-zinc-400 hover:text-zinc-700 transition-colors mb-6 inline-block">
         ← Back
       </Link>
-      <h1 className="text-2xl font-bold mb-6">New entry — photo</h1>
+      <h1 className="text-2xl font-bold mb-6">Photo</h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-3 w-full">
         <input
           ref={fileInputRef}
