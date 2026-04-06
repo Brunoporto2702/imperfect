@@ -1,4 +1,4 @@
-import type { IntakeItem } from "@/server/core/models/food";
+import type { IntakeItem } from "@/server/food/core/models/food";
 
 export type DayBar = {
   label: string;

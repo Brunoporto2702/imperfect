@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import type { IntakeItem } from "@/server/core/models/food";
+import type { IntakeItem } from "@/server/food/core/models/food";
 import { loadIntakeItems, deleteIntakeItem } from "@/client/features/entries/intakeItems";
 import { getDaySummaries } from "@/client/logic/entries";
 

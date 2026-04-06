@@ -1,5 +1,5 @@
 import { post } from "@/client/infra/http";
-import type { IntakeEntry, IntakeItem } from "@/server/core/models/food";
+import type { IntakeEntry, IntakeItem } from "@/server/food/core/models/food";
 
 export type CreateEntryResponse = {
   intakeEntry: IntakeEntry;

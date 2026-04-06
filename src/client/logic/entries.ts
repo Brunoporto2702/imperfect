@@ -1,4 +1,4 @@
-import type { IntakeItem } from "@/server/core/models/food";
+import type { IntakeItem } from "@/server/food/core/models/food";
 
 export function getWeeklyStats(items: IntakeItem[]) {
   const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();

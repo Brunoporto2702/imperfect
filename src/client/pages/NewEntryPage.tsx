@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import type { IntakeEntry, IntakeItem } from "@/server/core/models/food";
+import type { IntakeEntry, IntakeItem } from "@/server/food/core/models/food";
 import { createEntry } from "@/client/features/entries/api";
 import { addIntakeEntry } from "@/client/features/entries/intakeEntries";
 import { addIntakeItems, loadIntakeItems } from "@/client/features/entries/intakeItems";

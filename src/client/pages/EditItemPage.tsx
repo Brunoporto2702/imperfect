@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import type { IntakeItem } from "@/server/core/models/food";
+import type { IntakeItem } from "@/server/food/core/models/food";
 import { loadIntakeItems, updateIntakeItem } from "@/client/features/entries/intakeItems";
 
 function toDateTimeLocal(iso: string): string {

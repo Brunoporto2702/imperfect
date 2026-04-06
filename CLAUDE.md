@@ -25,12 +25,10 @@ npm test          # Vitest (unit + integration)
 - **Backend**: Next.js API routes
 - **Validation**: Zod (all AI responses must be validated with Zod)
 - **Testing**: Vitest
-- **Database**: SQLite (not yet added)
+- **Database**: libsql/Turso (SQLite locally via `file:local.db`, Turso in prod)
 - **AI**: Anthropic Claude (via @anthropic-ai/sdk)
 
 ## Architecture
-
-Ports and adapters on the backend. Feature-Sliced Design on the frontend.
 
 ```
 src/
@@ -40,23 +38,39 @@ src/
     items/page.tsx                        # /items — renders ItemsPage
     items/[id]/page.tsx                   # /items/[id] — renders EditItemPage
     log/page.tsx                          # /log — renders LogPage
-    api/entries/route.ts                  # POST /api/entries — wires provider, delegates to service
+    api/entries/route.ts                  # POST /api/entries — wires db + provider, delegates to service
+  instrumentation.ts                      # runs migrations once on server startup
 
   server/
-    core/                                 # Domain — no framework dependencies
-      models/
-        food.ts                           # IntakeEntrySchema, IntakeItemSchema, ParsedItemSchema, types
-        entry.ts                          # CreateEntryRequestSchema
-      dto/
-        ai.ts                             # AiResponseDtoSchema — wire shape from AI provider
-      logic/
-        prompt.ts                         # PROMPT + buildPrompt(rawInput)
-        parser.ts                         # AIProvider port + sanitizeInput + parseAIResponse → IntakeEntry
-        food.ts                           # buildIntakeItems(IntakeEntry) → IntakeItem[]
-      services/
-        food.ts                           # createEntry(rawInput, provider) → { intakeEntry, intakeItems }
-    providers/
-      ai.anthropic.ts                     # Anthropic adapter implementing AIProvider
+    food/                                 # Food domain
+      core/                               # Pure domain logic — no framework or infra dependencies
+        models/
+          food.ts                         # IntakeEntrySchema, IntakeItemSchema, ParsedItemSchema, types
+          entry.ts                        # CreateEntryRequestSchema
+        dto/
+          ai.ts                           # AiResponseDtoSchema — wire shape from AI provider
+        logic/
+          prompt.ts                       # PROMPT + buildPrompt(rawInput)
+          parser.ts                       # AIProvider type + sanitizeInput + parseAIResponse → IntakeEntry
+          food.ts                         # buildIntakeItems(IntakeEntry) → IntakeItem[]
+        services/
+          food.ts                         # createEntry(rawInput, provider, db) → { intakeEntry, intakeItems }
+      providers/
+        ai/
+          anthropic.ts                    # Anthropic adapter implementing AIProvider
+        persistence/
+          sql/
+            entry.ts                      # save(db, entry) — SQL persistence for IntakeEntry
+      migrations/
+        index.ts                          # Migration list (SQL inline as TS strings)
+
+    lib/
+      sqldb/                              # Generic DB infrastructure — no domain knowledge
+        sql-db.ts                         # SqlDb interface: execute + batch
+        libsql-db.ts                      # createLibSqlDb(config) → SqlDb  (Turso/libsql)
+        in-memory-db.ts                   # createInMemoryDb() → SqlDb  (:memory:, for tests)
+        migration-runner.ts               # runMigrations(db, migrations) — idempotent
+        index.ts                          # barrel re-exports
 
   client/
     infra/
@@ -86,14 +100,14 @@ src/
 ```
 
 Client layer rules:
-- **`logic/`** — pure functions over domain data. No framework dependencies, no side effects. Mirrors `server/core/logic/`.
+- **`logic/`** — pure functions over domain data. No framework dependencies, no side effects. Mirrors `server/food/core/logic/`.
 - **`pages/`** — page-level components: own layout, route logic, and business orchestration. Not reused across routes.
 - **`components/`** — reusable atoms with no route awareness or side effects.
 - **`infra/`** — generic wrappers. Know nothing about domain types.
 - **`features/`** — domain-aware storage and API. Compose infra.
 
 Core flow:
-user adds items one-by-one (name + qty) → staged list in `NewEntryPage` → joined as `rawInput` → `features/entries/api` → POST /api/entries → `createEntry(rawInput, provider)` → `buildPrompt` → AI → `parseAIResponse` → `buildIntakeItems` → previewed in UI → on accept: saved to localStorage (intakeEntries + intakeItems) → toast + redirect to dashboard
+user adds items one-by-one (name + qty) → staged list in `NewEntryPage` → joined as `rawInput` → `features/entries/api` → POST /api/entries → `createEntry(rawInput, provider, db)` → `buildPrompt` → AI → `parseAIResponse` → `buildIntakeItems` → `EntryRepository.save(db, entry)` → previewed in UI → on accept: saved to localStorage (intakeEntries + intakeItems) → toast + redirect to dashboard
 
 ## Data Model (must follow exactly)
 
@@ -154,14 +168,25 @@ type CreateEntryRequest = {
 
 ## Architectural rules
 
-- **Providers are pure transport** — they receive a pre-built message string and return a raw string. No domain logic inside providers.
-- **Core has no framework dependencies** — nothing in `server/core/` should import from Next.js or any provider.
-- **Services are plain functions** — `createEntry(rawInput, provider)` takes explicit dependencies, no factory needed.
-- **`createHandler(provider)`** in route.ts exists for controller-level testability only.
+- **`server/food/core/` has no infra dependencies** — nothing in core imports from Next.js, libsql, or any provider.
+- **`server/lib/sqldb/` is generic** — no domain knowledge. Knows nothing about food, entries, or migrations content.
+- **Persistence functions are plain exports** — `save(db, entry)` in `sql/entry.ts`. No class, no factory, no object.
+- **`createEntry(rawInput, provider, db)`** — service consciously receives `SqlDb`. Explicit decision, not hidden behind an interface.
+- **`createHandler(provider, db)`** in route.ts exists for controller-level testability only. `POST` is the production wiring.
+- **Migrations run in `instrumentation.ts`** — once on server startup, before any requests. `runMigrations` is idempotent.
+- **Tests use `createInMemoryDb()`** — real SQL, zero disk, isolated per instance.
 - **Client infra is generic** — `http.ts`, `storage.ts`, `toast.tsx` know nothing about domain types. Features compose them.
 - **`IntakeEntry` is append-only** — never mutated after creation. Edits happen only on `IntakeItem`.
 - **`dto/`** is the wire boundary — `AiResponseDto` is mapped to domain types in `logic/parser.ts`, never used beyond that layer.
 - **Dynamic route params in Next.js 16 are async** — always type as `Promise<{ id: string }>` and await in an async page component.
+
+## Environment variables
+
+```bash
+DATABASE_URL=file:local.db        # dev default — no config needed
+DATABASE_URL=libsql://...         # Turso prod URL
+TURSO_AUTH_TOKEN=...              # Turso auth token (prod only)
+```
 
 ## Constraints
 

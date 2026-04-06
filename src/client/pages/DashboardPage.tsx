@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import type { IntakeEntry, IntakeItem } from "@/server/core/models/food";
+import type { IntakeEntry, IntakeItem } from "@/server/food/core/models/food";
 import { loadIntakeEntries } from "@/client/features/entries/intakeEntries";
 import { loadIntakeItems } from "@/client/features/entries/intakeItems";
 import { loadTarget, saveTarget } from "@/client/features/profile/target";

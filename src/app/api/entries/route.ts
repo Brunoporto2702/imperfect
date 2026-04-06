@@ -1,10 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { CreateEntryRequestSchema } from "@/server/core/models/entry";
-import { createEntry } from "@/server/core/services/food";
-import { type AIProvider } from "@/server/core/logic/parser";
-import { anthropicProvider } from "@/server/providers/ai.anthropic";
+import { CreateEntryRequestSchema } from "@/server/food/core/models/entry";
+import { createEntry } from "@/server/food/core/services/food";
+import { type AIProvider } from "@/server/food/core/logic/parser";
+import { anthropicProvider } from "@/server/food/providers/ai/anthropic";
+import { type SqlDb } from "@/server/lib/sql-db/sql-db";
+import { TursoDb } from "@/server/lib/sql-db/turso/turso-db";
 
-export function createHandler(provider: AIProvider) {
+const db = new TursoDb({
+  url: process.env.DATABASE_URL ?? "file:local.db",
+  authToken: process.env.TURSO_AUTH_TOKEN,
+});
+
+export function createHandler(provider: AIProvider, db: SqlDb) {
   return async function POST(request: NextRequest) {
     const body = await request.json();
 
@@ -14,7 +21,7 @@ export function createHandler(provider: AIProvider) {
     }
 
     try {
-      const { intakeEntry, intakeItems } = await createEntry(result.data.rawInput, provider);
+      const { intakeEntry, intakeItems } = await createEntry(result.data.rawInput, provider, db);
       return NextResponse.json({ intakeEntry, intakeItems });
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to parse food";
@@ -23,4 +30,4 @@ export function createHandler(provider: AIProvider) {
   };
 }
 
-export const POST = createHandler(anthropicProvider);
+export const POST = createHandler(anthropicProvider, db);

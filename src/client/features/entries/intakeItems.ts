@@ -1,5 +1,5 @@
 import { getItem, setItem } from "@/client/infra/storage";
-import type { IntakeItem } from "@/server/core/models/food";
+import type { IntakeItem } from "@/server/food/core/models/food";
 
 const STORAGE_KEY = "imperfect:intakeItems";
 

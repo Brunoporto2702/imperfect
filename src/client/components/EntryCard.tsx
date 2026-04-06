@@ -1,4 +1,4 @@
-import type { IntakeEntry, IntakeItem } from "@/server/core/models/food";
+import type { IntakeEntry, IntakeItem } from "@/server/food/core/models/food";
 
 function formatDate(value: string): string {
   const d = new Date(value);

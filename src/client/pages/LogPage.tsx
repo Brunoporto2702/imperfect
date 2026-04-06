@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import type { IntakeEntry } from "@/server/core/models/food";
+import type { IntakeEntry } from "@/server/food/core/models/food";
 import { loadIntakeEntries } from "@/client/features/entries/intakeEntries";
 
 function formatDate(iso: string): string {

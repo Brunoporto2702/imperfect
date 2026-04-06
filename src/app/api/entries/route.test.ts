@@ -1,7 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
 import { NextRequest } from "next/server";
 import { createHandler } from "./route";
-import type { AIProvider } from "@/server/core/logic/parser";
+import type { AIProvider } from "@/server/food/core/logic/parser";
+import type { SqlDb } from "@/server/lib/sql-db/sql-db";
 
 const validAIResponse = JSON.stringify({
   items: [
@@ -17,10 +18,17 @@ function makeRequest(body: unknown) {
   });
 }
 
+function makeDb(): SqlDb {
+  return {
+    execute: vi.fn().mockResolvedValue({ rows: [] }),
+    batch: vi.fn().mockResolvedValue(undefined),
+  };
+}
+
 describe("POST handler", () => {
   it("returns 200 with intakeEntry and intakeItems on success", async () => {
     const provider: AIProvider = vi.fn().mockResolvedValue(validAIResponse);
-    const POST = createHandler(provider);
+    const POST = createHandler(provider, makeDb());
 
     const res = await POST(makeRequest({ rawInput: "two eggs" }));
     expect(res.status).toBe(200);
@@ -36,7 +44,7 @@ describe("POST handler", () => {
 
   it("returns 400 and does not call provider when rawInput is empty", async () => {
     const provider: AIProvider = vi.fn();
-    const POST = createHandler(provider);
+    const POST = createHandler(provider, makeDb());
 
     const res = await POST(makeRequest({ rawInput: "" }));
     expect(res.status).toBe(400);
@@ -44,7 +52,7 @@ describe("POST handler", () => {
   });
 
   it("returns 400 when rawInput is missing", async () => {
-    const POST = createHandler(vi.fn());
+    const POST = createHandler(vi.fn(), makeDb());
 
     const res = await POST(makeRequest({}));
     expect(res.status).toBe(400);
@@ -52,7 +60,7 @@ describe("POST handler", () => {
 
   it("returns 500 with the error message when provider throws an Error", async () => {
     const provider: AIProvider = vi.fn().mockRejectedValue(new Error("network failure"));
-    const POST = createHandler(provider);
+    const POST = createHandler(provider, makeDb());
 
     const res = await POST(makeRequest({ rawInput: "two eggs" }));
     expect(res.status).toBe(500);
@@ -61,7 +69,7 @@ describe("POST handler", () => {
 
   it("returns 500 with fallback message when provider throws a non-Error", async () => {
     const provider: AIProvider = vi.fn().mockRejectedValue("something went wrong");
-    const POST = createHandler(provider);
+    const POST = createHandler(provider, makeDb());
 
     const res = await POST(makeRequest({ rawInput: "two eggs" }));
     expect(res.status).toBe(500);
