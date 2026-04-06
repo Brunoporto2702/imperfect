@@ -3,18 +3,18 @@ import Link from "next/link";
 const INPUT_TYPES = [
   {
     href: "/new/items",
-    title: "By items",
-    description: "Add each food item individually with name and quantity.",
+    title: "Por itens",
+    description: "Adicione cada alimento com nome e quantidade.",
   },
   {
     href: "/new/text",
-    title: "Free text",
-    description: "Describe your meal in your own words, any language.",
+    title: "Texto livre",
+    description: "Descreva sua refeição do jeito que quiser.",
   },
   {
     href: "/new/image",
-    title: "Photo",
-    description: "Take a photo or upload an image of your meal.",
+    title: "Foto",
+    description: "Tire uma foto ou envie uma imagem da refeição.",
   },
 ];
 
@@ -22,9 +22,9 @@ export default function Page() {
   return (
     <main className="w-full max-w-xl mx-auto p-8">
       <Link href="/" className="text-sm text-zinc-400 hover:text-zinc-700 transition-colors mb-6 inline-block">
-        ← Back
+        ← Voltar
       </Link>
-      <h1 className="text-2xl font-bold mb-8">New entry</h1>
+      <h1 className="text-2xl font-bold mb-8">Nova entrada</h1>
       <div className="flex flex-col gap-4">
         {INPUT_TYPES.map(({ href, title, description }) => (
           <Link

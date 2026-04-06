@@ -38,7 +38,7 @@ export function NewTextEntryPage() {
     if (!preview) return;
     addIntakeEntry(preview.entry);
     addIntakeItems(preview.items);
-    showToast("Entry saved.");
+    showToast("Entrada salva.");
     router.push("/");
   }
 
@@ -49,20 +49,20 @@ export function NewTextEntryPage() {
   if (preview) {
     return (
       <main className="w-full max-w-xl mx-auto p-8">
-        <h1 className="text-2xl font-bold mb-6">Review entry</h1>
+        <h1 className="text-2xl font-bold mb-6">Revisar entrada</h1>
         <EntryCard entry={preview.entry} items={preview.items} />
         <div className="mt-6 flex gap-3">
           <button
             onClick={handleAccept}
             className="bg-black text-white rounded px-4 py-2 text-sm flex-1"
           >
-            Accept
+            Aceitar
           </button>
           <button
             onClick={handleDiscard}
             className="border rounded px-4 py-2 text-sm flex-1"
           >
-            Discard
+            Descartar
           </button>
         </div>
       </main>
@@ -72,14 +72,14 @@ export function NewTextEntryPage() {
   return (
     <main className="w-full max-w-xl mx-auto p-8">
       <Link href="/new" className="text-sm text-zinc-400 hover:text-zinc-700 transition-colors mb-6 inline-block">
-        ← Back
+        ← Voltar
       </Link>
       <h1 className="text-2xl font-bold mb-6">Free text</h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-3 w-full">
         <textarea
           value={rawInput}
           onChange={(e) => setRawInput(e.target.value)}
-          placeholder="Describe your meal... e.g. Today I had grilled chicken with rice and salad"
+          placeholder="Descreva sua refeição... ex: Almoço com frango grelhado, arroz e salada"
           rows={5}
           className="border rounded px-3 py-2 text-sm resize-none"
           autoFocus
@@ -89,7 +89,7 @@ export function NewTextEntryPage() {
           disabled={loading || !rawInput.trim()}
           className="bg-black text-white rounded px-4 py-2 text-sm disabled:opacity-40"
         >
-          {loading ? "Analyzing..." : "Analyze"}
+          {loading ? "Analisando..." : "Analisar"}
         </button>
       </form>
       {error && <p className="mt-4 text-sm text-red-600">{error}</p>}

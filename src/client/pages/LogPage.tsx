@@ -24,12 +24,12 @@ export function LogPage() {
   return (
     <main className="w-full max-w-xl mx-auto p-8 pb-28">
       <Link href="/" className="text-sm text-zinc-400 hover:text-zinc-700 transition-colors mb-6 inline-block">
-        ← Back
+        ← Voltar
       </Link>
-      <h1 className="text-2xl font-bold mb-6">AI Log</h1>
+      <h1 className="text-2xl font-bold mb-6">Log</h1>
 
       {entries.length === 0 ? (
-        <p className="text-sm text-zinc-400">No entries yet.</p>
+        <p className="text-sm text-zinc-400">Nenhuma entrada ainda.</p>
       ) : (
         <div className="flex flex-col gap-6">
           {entries.map((entry) => (
@@ -42,7 +42,7 @@ export function LogPage() {
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-xs text-zinc-400">{entry.parsedItems.length} items parsed</span>
+                <span className="text-xs text-zinc-400">{entry.parsedItems.length} itens identificados</span>
               </div>
 
               <ul className="flex flex-col gap-1 border-t pt-3">

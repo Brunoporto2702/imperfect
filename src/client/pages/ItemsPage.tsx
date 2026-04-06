@@ -14,7 +14,7 @@ export function ItemsPage() {
   }, []);
 
   function handleDelete(id: string) {
-    if (!confirm("Delete this item?")) return;
+    if (!confirm("Excluir este alimento?")) return;
     deleteIntakeItem(id);
     setItems((prev) => prev.filter((item) => item.id !== id));
   }
@@ -24,12 +24,12 @@ export function ItemsPage() {
   return (
     <main className="w-full max-w-xl mx-auto p-8 pb-28">
       <Link href="/" className="text-sm text-zinc-400 hover:text-zinc-700 transition-colors mb-6 inline-block">
-        ← Back
+        ← Voltar
       </Link>
-      <h1 className="text-2xl font-bold mb-6">Items</h1>
+      <h1 className="text-2xl font-bold mb-6">Alimentos</h1>
 
       {daySummaries.length === 0 ? (
-        <p className="text-sm text-zinc-400">No items yet.</p>
+        <p className="text-sm text-zinc-400">Nenhum alimento registrado ainda.</p>
       ) : (
         <div className="flex flex-col gap-6">
           {daySummaries.map((day) => (
@@ -47,9 +47,9 @@ export function ItemsPage() {
                       </span>
                       <span className="text-xs text-zinc-400">
                         {item.caloriesMin}–{item.caloriesMax} kcal
-                        {item.protein != null && ` · ${item.protein}g protein`}
+                        {item.protein != null && ` · ${item.protein}g proteína`}
                         {item.editedByUser && (
-                          <span className="ml-1.5 text-zinc-300">· edited</span>
+                          <span className="ml-1.5 text-zinc-300">· editado</span>
                         )}
                       </span>
                     </div>
@@ -58,12 +58,12 @@ export function ItemsPage() {
                         href={`/items/${item.id}`}
                         className="text-xs text-zinc-400 hover:text-zinc-700 transition-colors"
                       >
-                        Edit
+                        Editar
                       </Link>
                       <button
                         onClick={() => handleDelete(item.id)}
                         className="text-zinc-300 hover:text-red-500 transition-colors text-base leading-none"
-                        aria-label="Delete item"
+                        aria-label="Excluir item"
                       >
                         ×
                       </button>

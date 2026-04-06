@@ -72,7 +72,7 @@ export function NewImageEntryPage() {
     if (!preview) return;
     addIntakeEntry(preview.entry);
     addIntakeItems(preview.items);
-    showToast("Entry saved.");
+    showToast("Entrada salva.");
     router.push("/");
   }
 
@@ -83,20 +83,20 @@ export function NewImageEntryPage() {
   if (preview) {
     return (
       <main className="w-full max-w-xl mx-auto p-8">
-        <h1 className="text-2xl font-bold mb-6">Review entry</h1>
+        <h1 className="text-2xl font-bold mb-6">Revisar entrada</h1>
         <EntryCard entry={preview.entry} items={preview.items} />
         <div className="mt-6 flex gap-3">
           <button
             onClick={handleAccept}
             className="bg-black text-white rounded px-4 py-2 text-sm flex-1"
           >
-            Accept
+            Aceitar
           </button>
           <button
             onClick={handleDiscard}
             className="border rounded px-4 py-2 text-sm flex-1"
           >
-            Discard
+            Descartar
           </button>
         </div>
       </main>
@@ -106,7 +106,7 @@ export function NewImageEntryPage() {
   return (
     <main className="w-full max-w-xl mx-auto p-8">
       <Link href="/new" className="text-sm text-zinc-400 hover:text-zinc-700 transition-colors mb-6 inline-block">
-        ← Back
+        ← Voltar
       </Link>
       <h1 className="text-2xl font-bold mb-6">Photo</h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-3 w-full">
@@ -123,14 +123,14 @@ export function NewImageEntryPage() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={imageDataUrl}
-              alt="Selected meal"
+              alt="Foto da refeição"
               className="w-full rounded object-cover max-h-64"
             />
             <button
               type="button"
               onClick={handleClearImage}
               className="absolute top-2 right-2 bg-black/60 text-white rounded-full w-7 h-7 flex items-center justify-center text-base leading-none"
-              aria-label="Remove image"
+              aria-label="Remover imagem"
             >
               ×
             </button>
@@ -141,13 +141,13 @@ export function NewImageEntryPage() {
             onClick={() => fileInputRef.current?.click()}
             className="border-2 border-dashed border-zinc-300 rounded px-4 py-8 text-sm text-zinc-400 hover:border-zinc-500 hover:text-zinc-600 transition-colors text-center"
           >
-            Tap to attach a photo
+            Toque para adicionar uma foto
           </button>
         )}
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="Description (optional)"
+          placeholder="Descrição (opcional)"
           rows={2}
           className="border rounded px-3 py-2 text-sm resize-none"
         />
@@ -156,7 +156,7 @@ export function NewImageEntryPage() {
           disabled={loading || !imageDataUrl}
           className="bg-black text-white rounded px-4 py-2 text-sm disabled:opacity-40 mt-1"
         >
-          {loading ? "Analyzing..." : "Analyze"}
+          {loading ? "Analisando..." : "Analisar"}
         </button>
       </form>
       {error && <p className="mt-4 text-sm text-red-600">{error}</p>}

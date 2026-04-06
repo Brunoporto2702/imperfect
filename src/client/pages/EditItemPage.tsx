@@ -62,13 +62,13 @@ export function EditItemPage({ id }: { id: string }) {
   return (
     <main className="w-full max-w-xl mx-auto p-8">
       <Link href="/items" className="text-sm text-zinc-400 hover:text-zinc-700 transition-colors mb-6 inline-block">
-        ← Back
+        ← Voltar
       </Link>
-      <h1 className="text-2xl font-bold mb-6">Edit item</h1>
+      <h1 className="text-2xl font-bold mb-6">Editar alimento</h1>
 
       <form onSubmit={handleSave} className="flex flex-col gap-4 w-full">
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-zinc-500">Name</label>
+          <label className="text-xs text-zinc-500">Nome</label>
           <input
             className="border rounded px-3 py-2 text-sm"
             value={form.name}
@@ -78,7 +78,7 @@ export function EditItemPage({ id }: { id: string }) {
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-zinc-500">Quantity</label>
+          <label className="text-xs text-zinc-500">Quantidade</label>
           <input
             className="border rounded px-3 py-2 text-sm"
             value={form.quantity}
@@ -89,7 +89,7 @@ export function EditItemPage({ id }: { id: string }) {
 
         <div className="flex gap-3">
           <div className="flex flex-col gap-1 flex-1">
-            <label className="text-xs text-zinc-500">Calories min</label>
+            <label className="text-xs text-zinc-500">Calorias mín.</label>
             <input
               type="number"
               min={0}
@@ -100,7 +100,7 @@ export function EditItemPage({ id }: { id: string }) {
             />
           </div>
           <div className="flex flex-col gap-1 flex-1">
-            <label className="text-xs text-zinc-500">Calories max</label>
+            <label className="text-xs text-zinc-500">Calorias máx.</label>
             <input
               type="number"
               min={0}
@@ -113,7 +113,7 @@ export function EditItemPage({ id }: { id: string }) {
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-zinc-500">Protein (g) — optional</label>
+          <label className="text-xs text-zinc-500">Proteína (g) — opcional</label>
           <input
             type="number"
             min={0}
@@ -124,7 +124,7 @@ export function EditItemPage({ id }: { id: string }) {
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-zinc-500">Consumed at</label>
+          <label className="text-xs text-zinc-500">Consumido em</label>
           <input
             type="datetime-local"
             className="border rounded px-3 py-2 text-sm"
@@ -139,13 +139,13 @@ export function EditItemPage({ id }: { id: string }) {
             type="submit"
             className="bg-black text-white rounded px-4 py-2 text-sm flex-1"
           >
-            Save
+            Salvar
           </button>
           <Link
             href="/items"
             className="border rounded px-4 py-2 text-sm flex-1 text-center"
           >
-            Cancel
+            Cancelar
           </Link>
         </div>
       </form>

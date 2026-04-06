@@ -50,17 +50,17 @@ export function DashboardPage() {
   return (
     <main className="w-full max-w-xl mx-auto p-8 pb-28">
       {entries.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center gap-4">
-          <p className="text-4xl">🍽️</p>
-          <p className="text-lg font-semibold">Nothing tracked yet</p>
-          <p className="text-sm text-zinc-500 max-w-xs">
-            Log your first meal and get an instant calorie and protein estimate.
+        <div className="flex flex-col items-start justify-center py-20 gap-4 max-w-xs">
+          <p className="text-2xl font-bold leading-snug">Rastreie sem obsessão.</p>
+          <p className="text-sm text-zinc-500 leading-relaxed">
+            Descreva o que comeu como vier na cabeça — texto livre, foto, ou item a item.
+            A gente estima calorias e proteína. Sem pesagem, sem tabela.
           </p>
           <Link
-            href="/new"
+            href="/new/text"
             className="mt-2 bg-black text-white rounded px-5 py-2.5 text-sm hover:bg-zinc-800 transition-colors"
           >
-            Add first meal
+            Registrar primeira refeição
           </Link>
         </div>
       ) : (
@@ -68,7 +68,7 @@ export function DashboardPage() {
           {/* Weekly stats + insight */}
           <div className="border rounded-lg p-5 mb-8">
             <h2 className="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-4">
-              This week
+              Esta semana
             </h2>
             <div className="flex gap-8 mb-4">
               <div>
@@ -78,12 +78,12 @@ export function DashboardPage() {
               {weekly.protein > 0 && (
                 <div>
                   <p className="text-xl font-semibold">{weekly.protein}g</p>
-                  <p className="text-xs text-zinc-500 mt-0.5">protein</p>
+                  <p className="text-xs text-zinc-500 mt-0.5">proteína</p>
                 </div>
               )}
               <div>
                 <p className="text-xl font-semibold">{weekly.count}</p>
-                <p className="text-xs text-zinc-500 mt-0.5">items</p>
+                <p className="text-xs text-zinc-500 mt-0.5">itens</p>
               </div>
             </div>
             <p className={`text-xs ${SENTIMENT_STYLES[insight.sentiment]}`}>
@@ -95,11 +95,11 @@ export function DashboardPage() {
           <div className="px-1 mb-8">
             <div className="flex items-center justify-between mb-3">
               <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide">
-                Calories / day
+                Calorias / dia
               </p>
               <div className="flex items-center gap-1.5">
                 <label className="text-xs text-zinc-400" htmlFor="daily-target">
-                  Target
+                  Meta
                 </label>
                 <input
                   id="daily-target"
@@ -127,7 +127,7 @@ export function DashboardPage() {
                       {day.calMin}–{day.calMax} kcal
                     </span>
                     <Link href="/items" className="text-xs text-zinc-400 hover:text-zinc-700 transition-colors">
-                      Edit
+                      Editar
                     </Link>
                   </div>
                 </div>
@@ -152,7 +152,7 @@ export function DashboardPage() {
 
       <Link
         href="/new"
-        aria-label="Add entry"
+        aria-label="Nova entrada"
         className="fixed bottom-6 right-6 w-14 h-14 bg-black text-white rounded-full flex items-center justify-center text-2xl shadow-lg hover:bg-zinc-800 transition-colors"
       >
         +

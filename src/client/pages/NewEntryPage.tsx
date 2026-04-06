@@ -61,7 +61,7 @@ export function NewEntryPage() {
     if (!preview) return;
     addIntakeEntry(preview.entry);
     addIntakeItems(preview.items);
-    showToast("Entry saved.");
+    showToast("Entrada salva.");
     router.push("/");
   }
 
@@ -72,20 +72,20 @@ export function NewEntryPage() {
   if (preview) {
     return (
       <main className="w-full max-w-xl mx-auto p-8">
-        <h1 className="text-2xl font-bold mb-6">Review entry</h1>
+        <h1 className="text-2xl font-bold mb-6">Revisar entrada</h1>
         <EntryCard entry={preview.entry} items={preview.items} />
         <div className="mt-6 flex gap-3">
           <button
             onClick={handleAccept}
             className="bg-black text-white rounded px-4 py-2 text-sm flex-1"
           >
-            Accept
+            Aceitar
           </button>
           <button
             onClick={handleDiscard}
             className="border rounded px-4 py-2 text-sm flex-1"
           >
-            Discard
+            Descartar
           </button>
         </div>
       </main>
@@ -95,7 +95,7 @@ export function NewEntryPage() {
   return (
     <main className="w-full max-w-xl mx-auto p-8">
       <Link href="/new" className="text-sm text-zinc-400 hover:text-zinc-700 transition-colors mb-6 inline-block">
-        ← Back
+        ← Voltar
       </Link>
       <h1 className="text-2xl font-bold mb-6">By items</h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-3 w-full">
@@ -109,13 +109,13 @@ export function NewEntryPage() {
                   type="text"
                   value={item.qty}
                   onChange={(e) => handleUpdateQty(i, e.target.value)}
-                  placeholder="qty"
+                  placeholder="qtd"
                   className="border rounded px-2 py-1 w-16 text-xs text-center text-zinc-600"
                 />
                 <button
                   type="button"
                   onClick={() => handleRemove(i)}
-                  aria-label="Remove item"
+                  aria-label="Remover item"
                   className="text-zinc-300 hover:text-red-500 transition-colors text-base leading-none"
                 >
                   ×
@@ -129,7 +129,7 @@ export function NewEntryPage() {
           disabled={loading || stagedItems.length === 0}
           className="bg-black text-white rounded px-4 py-2 text-sm disabled:opacity-40 mt-1"
         >
-          {loading ? "Analyzing..." : "Analyze"}
+          {loading ? "Analisando..." : "Analisar"}
         </button>
       </form>
       {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
