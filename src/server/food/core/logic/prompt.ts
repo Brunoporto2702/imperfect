@@ -76,6 +76,19 @@ Rules:
 - quantity: amount/portion only (e.g. "2 large", "200g", "1 slice")
 - respond in the same language as the input`;
 
-export function buildPrompt(rawInput: string): string {
-  return `${PROMPT}\n\nFood description: ${rawInput}`;
+import type { CreateEntryRequest } from "../models/entry";
+import type { AIPayload } from "./parser";
+
+export function buildPrompt(request: CreateEntryRequest): AIPayload {
+  if (request.inputType === "items") {
+    return { text: `${PROMPT}\n\nFood description: ${request.rawInput}` };
+  }
+  // inputType === "image"
+  const instruction = request.description?.trim()
+    ? `The user described this meal as: "${request.description}". Analyze the food visible in the image.`
+    : "Analyze the food visible in the image and identify all items.";
+  return {
+    text: `${PROMPT}\n\n${instruction}`,
+    imageDataUrl: request.imageDataUrl,
+  };
 }

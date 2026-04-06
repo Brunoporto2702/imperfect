@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { createEntry } from "./food";
-import type { AIProvider } from "../logic/parser";
+import type { AIProvider, AIPayload } from "../logic/parser";
 import type { SqlDb } from "@/server/lib/sql-db/sql-db";
 
 const validAIResponse = JSON.stringify({
@@ -20,7 +20,11 @@ describe("createEntry", () => {
   it("returns an IntakeEntry and IntakeItem[]", async () => {
     const provider: AIProvider = vi.fn().mockResolvedValue(validAIResponse);
 
-    const { intakeEntry, intakeItems } = await createEntry("two eggs", provider, makeDb());
+    const { intakeEntry, intakeItems } = await createEntry(
+      { inputType: "items", rawInput: "two eggs" },
+      provider,
+      makeDb()
+    );
 
     expect(intakeEntry.inputText).toBe("two eggs");
     expect(intakeEntry.parsedItems).toHaveLength(1);
@@ -30,7 +34,11 @@ describe("createEntry", () => {
   it("intakeItems carry calorie and protein values from parsedItems", async () => {
     const provider: AIProvider = vi.fn().mockResolvedValue(validAIResponse);
 
-    const { intakeItems } = await createEntry("two eggs", provider, makeDb());
+    const { intakeItems } = await createEntry(
+      { inputType: "items", rawInput: "two eggs" },
+      provider,
+      makeDb()
+    );
     const [item] = intakeItems;
 
     expect(item.caloriesMin).toBe(140);
@@ -41,7 +49,11 @@ describe("createEntry", () => {
   it("intakeItems are linked to the intakeEntry via processingId", async () => {
     const provider: AIProvider = vi.fn().mockResolvedValue(validAIResponse);
 
-    const { intakeEntry, intakeItems } = await createEntry("two eggs", provider, makeDb());
+    const { intakeEntry, intakeItems } = await createEntry(
+      { inputType: "items", rawInput: "two eggs" },
+      provider,
+      makeDb()
+    );
 
     expect(intakeItems[0].processingId).toBe(intakeEntry.id);
   });
@@ -49,22 +61,26 @@ describe("createEntry", () => {
   it("calls the provider with the prepared prompt", async () => {
     const provider: AIProvider = vi.fn().mockResolvedValue(validAIResponse);
 
-    await createEntry("two eggs", provider, makeDb());
+    await createEntry({ inputType: "items", rawInput: "two eggs" }, provider, makeDb());
 
-    const calledWith = (provider as ReturnType<typeof vi.fn>).mock.calls[0][0] as string;
-    expect(calledWith).toContain("two eggs");
+    const calledWith = (provider as ReturnType<typeof vi.fn>).mock.calls[0][0] as AIPayload;
+    expect(calledWith.text).toContain("two eggs");
   });
 
   it("propagates errors from the provider", async () => {
     const provider: AIProvider = vi.fn().mockRejectedValue(new Error("network failure"));
 
-    await expect(createEntry("two eggs", provider, makeDb())).rejects.toThrow("network failure");
+    await expect(
+      createEntry({ inputType: "items", rawInput: "two eggs" }, provider, makeDb())
+    ).rejects.toThrow("network failure");
   });
 
   it("throws when provider returns unparseable text", async () => {
     const provider: AIProvider = vi.fn().mockResolvedValue("not json at all");
 
-    await expect(createEntry("two eggs", provider, makeDb())).rejects.toThrow("AI returned non-JSON response");
+    await expect(
+      createEntry({ inputType: "items", rawInput: "two eggs" }, provider, makeDb())
+    ).rejects.toThrow("AI returned non-JSON response");
   });
 
   it("leaves protein undefined on items when not in AI response", async () => {
@@ -74,7 +90,49 @@ describe("createEntry", () => {
       })
     );
 
-    const { intakeItems } = await createEntry("rice", provider, makeDb());
+    const { intakeItems } = await createEntry(
+      { inputType: "items", rawInput: "rice" },
+      provider,
+      makeDb()
+    );
     expect(intakeItems[0].protein).toBeUndefined();
+  });
+
+  it("uses [image] as inputText when image-only (no description)", async () => {
+    const provider: AIProvider = vi.fn().mockResolvedValue(validAIResponse);
+
+    const { intakeEntry } = await createEntry(
+      { inputType: "image", imageDataUrl: "data:image/jpeg;base64,abc" },
+      provider,
+      makeDb()
+    );
+
+    expect(intakeEntry.inputText).toBe("[image]");
+  });
+
+  it("uses description as inputText when image + description", async () => {
+    const provider: AIProvider = vi.fn().mockResolvedValue(validAIResponse);
+
+    const { intakeEntry } = await createEntry(
+      { inputType: "image", imageDataUrl: "data:image/jpeg;base64,abc", description: "frango grelhado" },
+      provider,
+      makeDb()
+    );
+
+    expect(intakeEntry.inputText).toBe("frango grelhado");
+  });
+
+  it("passes imageDataUrl to provider for image input", async () => {
+    const provider: AIProvider = vi.fn().mockResolvedValue(validAIResponse);
+
+    await createEntry(
+      { inputType: "image", imageDataUrl: "data:image/jpeg;base64,abc" },
+      provider,
+      makeDb()
+    );
+
+    const calledWith = (provider as ReturnType<typeof vi.fn>).mock.calls[0][0] as AIPayload;
+    expect(calledWith.imageDataUrl).toBe("data:image/jpeg;base64,abc");
+    expect(calledWith.text).toContain("Analyze the food visible in the image");
   });
 });

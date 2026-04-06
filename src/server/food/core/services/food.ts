@@ -1,6 +1,7 @@
 import { AIProvider, parseAIResponse } from "../logic/parser";
 import { buildIntakeItems } from "../logic/food";
 import { buildPrompt } from "../logic/prompt";
+import type { CreateEntryRequest } from "../models/entry";
 import type { IntakeEntry, IntakeItem } from "../models/food";
 import type { SqlDb } from "@/server/lib/sql-db/sql-db";
 import * as EntryRepository from "../../providers/persistence/sql/entry";
@@ -11,13 +12,16 @@ export type CreateEntryResult = {
 };
 
 export async function createEntry(
-  rawInput: string,
+  request: CreateEntryRequest,
   provider: AIProvider,
   db: SqlDb
 ): Promise<CreateEntryResult> {
-  const prompt = buildPrompt(rawInput);
-  const rawText = await provider(prompt);
-  const intakeEntry = parseAIResponse(rawText, rawInput);
+  const payload = buildPrompt(request);
+  const rawText = await provider(payload);
+  const inputText = request.inputType === "items"
+    ? request.rawInput
+    : request.description ?? "[image]";
+  const intakeEntry = parseAIResponse(rawText, inputText);
   const intakeItems = buildIntakeItems(intakeEntry);
   await EntryRepository.save(db, intakeEntry);
   return { intakeEntry, intakeItems };

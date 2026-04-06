@@ -143,15 +143,37 @@ describe("IntakeItemSchema", () => {
 });
 
 describe("CreateEntryRequestSchema", () => {
-  it("accepts a valid rawInput", () => {
-    expect(CreateEntryRequestSchema.safeParse({ rawInput: "two eggs" }).success).toBe(true);
+  it("accepts items input with rawInput", () => {
+    expect(CreateEntryRequestSchema.safeParse({ inputType: "items", rawInput: "two eggs" }).success).toBe(true);
   });
 
-  it("rejects an empty rawInput", () => {
-    expect(CreateEntryRequestSchema.safeParse({ rawInput: "" }).success).toBe(false);
+  it("rejects items input with empty rawInput", () => {
+    expect(CreateEntryRequestSchema.safeParse({ inputType: "items", rawInput: "" }).success).toBe(false);
   });
 
-  it("rejects when rawInput is missing", () => {
-    expect(CreateEntryRequestSchema.safeParse({}).success).toBe(false);
+  it("rejects when inputType is missing", () => {
+    expect(CreateEntryRequestSchema.safeParse({ rawInput: "two eggs" }).success).toBe(false);
+  });
+
+  it("accepts image input with imageDataUrl", () => {
+    expect(
+      CreateEntryRequestSchema.safeParse({ inputType: "image", imageDataUrl: "data:image/jpeg;base64,abc" }).success
+    ).toBe(true);
+  });
+
+  it("accepts image input with imageDataUrl and description", () => {
+    expect(
+      CreateEntryRequestSchema.safeParse({
+        inputType: "image",
+        imageDataUrl: "data:image/jpeg;base64,abc",
+        description: "frango grelhado",
+      }).success
+    ).toBe(true);
+  });
+
+  it("rejects image input with invalid imageDataUrl", () => {
+    expect(
+      CreateEntryRequestSchema.safeParse({ inputType: "image", imageDataUrl: "not-a-data-url" }).success
+    ).toBe(false);
   });
 });

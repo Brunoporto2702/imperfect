@@ -30,7 +30,7 @@ describe("POST handler", () => {
     const provider: AIProvider = vi.fn().mockResolvedValue(validAIResponse);
     const POST = createHandler(provider, makeDb());
 
-    const res = await POST(makeRequest({ rawInput: "two eggs" }));
+    const res = await POST(makeRequest({ inputType: "items", rawInput: "two eggs" }));
     expect(res.status).toBe(200);
 
     const body = await res.json();
@@ -46,23 +46,35 @@ describe("POST handler", () => {
     const provider: AIProvider = vi.fn();
     const POST = createHandler(provider, makeDb());
 
-    const res = await POST(makeRequest({ rawInput: "" }));
+    const res = await POST(makeRequest({ inputType: "items", rawInput: "" }));
     expect(res.status).toBe(400);
     expect(provider).not.toHaveBeenCalled();
   });
 
-  it("returns 400 when rawInput is missing", async () => {
+  it("returns 400 when inputType is missing", async () => {
     const POST = createHandler(vi.fn(), makeDb());
 
-    const res = await POST(makeRequest({}));
+    const res = await POST(makeRequest({ rawInput: "two eggs" }));
     expect(res.status).toBe(400);
+  });
+
+  it("returns 200 for image input", async () => {
+    const provider: AIProvider = vi.fn().mockResolvedValue(validAIResponse);
+    const POST = createHandler(provider, makeDb());
+
+    const res = await POST(makeRequest({ inputType: "image", imageDataUrl: "data:image/jpeg;base64,abc" }));
+    expect(res.status).toBe(200);
+
+    const body = await res.json();
+    expect(body.intakeEntry.inputText).toBe("[image]");
+    expect(body.intakeItems).toHaveLength(1);
   });
 
   it("returns 500 with the error message when provider throws an Error", async () => {
     const provider: AIProvider = vi.fn().mockRejectedValue(new Error("network failure"));
     const POST = createHandler(provider, makeDb());
 
-    const res = await POST(makeRequest({ rawInput: "two eggs" }));
+    const res = await POST(makeRequest({ inputType: "items", rawInput: "two eggs" }));
     expect(res.status).toBe(500);
     expect((await res.json()).error).toBe("network failure");
   });
@@ -71,7 +83,7 @@ describe("POST handler", () => {
     const provider: AIProvider = vi.fn().mockRejectedValue("something went wrong");
     const POST = createHandler(provider, makeDb());
 
-    const res = await POST(makeRequest({ rawInput: "two eggs" }));
+    const res = await POST(makeRequest({ inputType: "items", rawInput: "two eggs" }));
     expect(res.status).toBe(500);
     expect((await res.json()).error).toBe("Failed to parse food");
   });

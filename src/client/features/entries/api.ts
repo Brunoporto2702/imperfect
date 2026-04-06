@@ -6,6 +6,10 @@ export type CreateEntryResponse = {
   intakeItems: IntakeItem[];
 };
 
-export function createEntry(rawInput: string): Promise<CreateEntryResponse> {
-  return post<CreateEntryResponse>("/api/entries", { rawInput });
+export function createItemsEntry(rawInput: string): Promise<CreateEntryResponse> {
+  return post<CreateEntryResponse>("/api/entries", { inputType: "items", rawInput });
+}
+
+export function createImageEntry(imageDataUrl: string, description?: string): Promise<CreateEntryResponse> {
+  return post<CreateEntryResponse>("/api/entries", { inputType: "image", imageDataUrl, description });
 }

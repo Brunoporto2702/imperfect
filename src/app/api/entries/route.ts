@@ -21,7 +21,7 @@ export function createHandler(provider: AIProvider, db: SqlDb) {
     }
 
     try {
-      const { intakeEntry, intakeItems } = await createEntry(result.data.rawInput, provider, db);
+      const { intakeEntry, intakeItems } = await createEntry(result.data, provider, db);
       return NextResponse.json({ intakeEntry, intakeItems });
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to parse food";

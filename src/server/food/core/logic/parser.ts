@@ -2,7 +2,8 @@ import { randomUUID } from "crypto";
 import { AiResponseDtoSchema } from "../dto/ai";
 import type { IntakeEntry } from "../models/food";
 
-export type AIProvider = (message: string) => Promise<string>;
+export type AIPayload = { text: string; imageDataUrl?: string };
+export type AIProvider = (payload: AIPayload) => Promise<string>;
 
 export function sanitizeInput(input: string): string {
   let output = input.replace(/\s+/g, " ").trim();

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import type { IntakeEntry, IntakeItem } from "@/server/food/core/models/food";
-import { createEntry } from "@/client/features/entries/api";
+import { createItemsEntry } from "@/client/features/entries/api";
 import { addIntakeEntry } from "@/client/features/entries/intakeEntries";
 import { addIntakeItems, loadIntakeItems } from "@/client/features/entries/intakeItems";
 import { useToast } from "@/client/infra/toast";
@@ -48,7 +48,7 @@ export function NewEntryPage() {
       const rawInput = stagedItems
         .map((i) => (i.qty ? `${i.qty} ${i.name}` : i.name))
         .join("\n");
-      const { intakeEntry, intakeItems } = await createEntry(rawInput);
+      const { intakeEntry, intakeItems } = await createItemsEntry(rawInput);
       setPreview({ entry: intakeEntry, items: intakeItems });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
@@ -131,6 +131,9 @@ export function NewEntryPage() {
         >
           {loading ? "Analyzing..." : "Analyze"}
         </button>
+        <Link href="/new/image" className="text-sm text-zinc-400 hover:text-zinc-600 text-center mt-1">
+          Try a different way →
+        </Link>
       </form>
       {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
     </main>
