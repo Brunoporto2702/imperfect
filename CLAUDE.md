@@ -25,7 +25,7 @@ npm test          # Vitest (unit + integration)
 - **Backend**: Next.js API routes
 - **Validation**: Zod (all AI responses must be validated with Zod)
 - **Testing**: Vitest
-- **Database**: libsql/Turso (SQLite locally via `file:local.db`, Turso in prod)
+- **Database**: libsql/Turso (SQLite locally via `file:local.db`, Turso in prod — deployed)
 - **AI**: Anthropic Claude (via @anthropic-ai/sdk)
 
 ## Architecture
@@ -65,12 +65,13 @@ src/
         index.ts                          # Migration list (SQL inline as TS strings)
 
     lib/
-      sqldb/                              # Generic DB infrastructure — no domain knowledge
-        sql-db.ts                         # SqlDb interface: execute + batch
-        libsql-db.ts                      # createLibSqlDb(config) → SqlDb  (Turso/libsql)
-        in-memory-db.ts                   # createInMemoryDb() → SqlDb  (:memory:, for tests)
+      sql-db/                             # Generic SQL infrastructure — no domain knowledge
+        sql-db.ts                         # SqlDb interface + SqlParam type
         migration-runner.ts               # runMigrations(db, migrations) — idempotent
         index.ts                          # barrel re-exports
+        turso/
+          turso-db.ts                     # class TursoDb implements SqlDb { dbConn: Client }
+          in-memory-db.ts                 # createInMemoryDb() → new TursoDb({ url: ':memory:' })
 
   client/
     infra/
@@ -169,7 +170,7 @@ type CreateEntryRequest = {
 ## Architectural rules
 
 - **`server/food/core/` has no infra dependencies** — nothing in core imports from Next.js, libsql, or any provider.
-- **`server/lib/sqldb/` is generic** — no domain knowledge. Knows nothing about food, entries, or migrations content.
+- **`server/lib/sql-db/` is generic** — no domain knowledge. Knows nothing about food, entries, or migrations content.
 - **Persistence functions are plain exports** — `save(db, entry)` in `sql/entry.ts`. No class, no factory, no object.
 - **`createEntry(rawInput, provider, db)`** — service consciously receives `SqlDb`. Explicit decision, not hidden behind an interface.
 - **`createHandler(provider, db)`** in route.ts exists for controller-level testability only. `POST` is the production wiring.
