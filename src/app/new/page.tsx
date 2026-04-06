@@ -30,7 +30,7 @@ export default function Page() {
           <Link
             key={href}
             href={href}
-            className="border rounded-lg px-5 py-4 hover:border-zinc-400 hover:bg-zinc-50 transition-colors"
+            className="border rounded-lg px-5 py-4 hover:border-zinc-400 transition-colors"
           >
             <p className="font-semibold text-sm">{title}</p>
             <p className="text-sm text-zinc-500 mt-1">{description}</p>
