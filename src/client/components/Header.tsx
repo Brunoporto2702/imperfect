@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { checkClientVersion } from "@/client/infra/version";
 
 const NAV = [
   { label: "Alimentos", href: "/items" },
@@ -10,6 +12,10 @@ const NAV = [
 
 export function Header() {
   const pathname = usePathname();
+
+  useEffect(() => {
+    checkClientVersion();
+  }, []);
 
   return (
     <header className="w-full border-b border-zinc-800/50 bg-zinc-950/90 backdrop-blur-sm sticky top-0 z-10">
