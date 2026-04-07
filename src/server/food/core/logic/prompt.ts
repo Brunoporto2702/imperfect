@@ -88,8 +88,8 @@ export function buildPrompt(request: CreateEntryRequest): AIPayload {
   }
   // inputType === "image"
   const instruction = request.description?.trim()
-    ? `The user described this meal as: "${request.description}". Analyze the food visible in the image.`
-    : "Analyze the food visible in the image and identify all items.";
+    ? `The user described this meal as: "${request.description}". Analyze the food visible in the image. Respond in the same language as the description.`
+    : "Analyze the food visible in the image and identify all items. Respond in Portuguese (pt-BR).";
   return {
     text: `${PROMPT}\n\n${instruction}`,
     imageDataUrl: request.imageDataUrl,
