@@ -57,7 +57,7 @@ export function DashboardPage() {
             A gente estima calorias e proteína. Sem pesagem, sem tabela.
           </p>
           <Link
-            href="/new/text"
+            href="/new"
             className="mt-2 bg-zinc-100 text-zinc-900 hover:bg-white transition-colors rounded-lg px-5 py-2.5 text-sm font-medium"
           >
             Registrar primeira refeição
