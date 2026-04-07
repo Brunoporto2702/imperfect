@@ -36,11 +36,11 @@ export function getDaySummaries(items: IntakeItem[]): DaySummary[] {
     .sort(([a], [b]) => b.localeCompare(a))
     .map(([dateKey, dayItems]) => {
       let label: string;
-      if (dateKey === today) label = "Today";
-      else if (dateKey === yesterday) label = "Yesterday";
+      if (dateKey === today) label = "Hoje";
+      else if (dateKey === yesterday) label = "Ontem";
       else {
         const d = new Date(dateKey + "T12:00:00");
-        label = d.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" });
+        label = d.toLocaleDateString("pt-BR", { weekday: "short", month: "short", day: "numeric" });
       }
 
       const calMin = dayItems.reduce((s, i) => s + i.caloriesMin, 0);
@@ -63,7 +63,7 @@ export function getWeeklyInsight(
   const weekItems = items.filter((item) => item.consumedAt >= weekAgo);
 
   if (weekItems.length === 0) {
-    return { message: "Log meals to get a weekly insight.", sentiment: "neutral" };
+    return { message: "Registre refeições para ver o insight da semana.", sentiment: "neutral" };
   }
 
   const days = new Set(weekItems.map((item) => item.consumedAt.slice(0, 10)));
@@ -78,7 +78,7 @@ export function getWeeklyInsight(
 
   if (target == null) {
     return {
-      message: `Averaging ~${avgDaily} kcal/day. Set a target for personalized insights.`,
+      message: `Média de ~${avgDaily} kcal/dia. Defina uma meta para insights personalizados.`,
       sentiment: "neutral",
     };
   }
@@ -88,18 +88,18 @@ export function getWeeklyInsight(
 
   if (ratio > 0.1) {
     return {
-      message: `Averaging ~${avgDaily} kcal/day — ~${diff} over your target. Consider lighter options.`,
+      message: `Média de ~${avgDaily} kcal/dia — ~${diff} acima da meta. Que tal opções mais leves?`,
       sentiment: "warning",
     };
   }
   if (ratio < -0.1) {
     return {
-      message: `Averaging ~${avgDaily} kcal/day — ~${Math.abs(diff)} under your target. You have room for more.`,
+      message: `Média de ~${avgDaily} kcal/dia — ~${Math.abs(diff)} abaixo da meta. Tem espaço pra mais.`,
       sentiment: "positive",
     };
   }
   return {
-    message: `On track — averaging ~${avgDaily} kcal/day, close to your ${target} kcal target.`,
+    message: `No caminho certo — ~${avgDaily} kcal/dia, próximo da meta de ${target} kcal.`,
     sentiment: "positive",
   };
 }

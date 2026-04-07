@@ -109,8 +109,8 @@ export function ItemInput({ onAdd, suggestions, disabled }: Props) {
       <div className="relative flex-1">
         <input
           type="text"
-          className="border rounded p-3 w-full text-sm"
-          placeholder="Item name"
+          className="bg-zinc-900 border border-zinc-800 text-zinc-50 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none rounded-lg p-3 w-full text-sm"
+          placeholder="Nome do alimento"
           value={name}
           onChange={(e) => {
             setName(e.target.value);
@@ -124,12 +124,12 @@ export function ItemInput({ onAdd, suggestions, disabled }: Props) {
           autoComplete="off"
         />
         {showDropdown && (
-          <ul className="absolute z-10 left-0 right-0 top-full mt-1 border rounded bg-white shadow-sm text-sm overflow-hidden">
+          <ul className="absolute z-10 left-0 right-0 top-full mt-1 bg-zinc-800 border border-zinc-700 rounded-lg shadow-lg text-sm overflow-hidden">
             {filtered.map((s, i) => (
               <li
                 key={s}
-                className={`px-3 py-2 cursor-pointer text-zinc-800 ${
-                  i === highlighted ? "bg-zinc-100" : "hover:bg-zinc-50"
+                className={`px-3 py-2 cursor-pointer text-zinc-200 ${
+                  i === highlighted ? "bg-zinc-700" : "hover:bg-zinc-700/50"
                 }`}
                 onMouseDown={(e) => {
                   e.preventDefault();
@@ -146,8 +146,8 @@ export function ItemInput({ onAdd, suggestions, disabled }: Props) {
       <input
         ref={qtyRef}
         type="text"
-        className="border rounded p-3 w-20 text-sm text-center"
-        placeholder="qty"
+        className="bg-zinc-900 border border-zinc-800 text-zinc-50 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none rounded-lg p-3 w-20 text-sm text-center"
+        placeholder="qtd"
         value={qty}
         onChange={(e) => setQty(e.target.value)}
         onKeyDown={handleQtyKeyDown}
@@ -158,9 +158,9 @@ export function ItemInput({ onAdd, suggestions, disabled }: Props) {
         type="button"
         onClick={commit}
         disabled={disabled || !name.trim()}
-        className="bg-black text-white rounded px-4 py-2 text-sm disabled:opacity-40 shrink-0"
+        className="bg-zinc-800 text-zinc-100 hover:bg-zinc-700 rounded-lg px-4 py-2 text-sm disabled:opacity-30 transition-colors shrink-0"
       >
-        Add
+        +
       </button>
     </div>
   );

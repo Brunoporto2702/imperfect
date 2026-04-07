@@ -12,9 +12,9 @@ export function Header() {
   const pathname = usePathname();
 
   return (
-    <header className="w-full border-b">
+    <header className="w-full border-b border-zinc-800/50 bg-zinc-950/90 backdrop-blur-sm sticky top-0 z-10">
       <div className="w-full max-w-xl mx-auto px-8 h-14 flex items-center justify-between">
-        <Link href="/" className="font-semibold text-sm tracking-tight">
+        <Link href="/" className="font-semibold text-base tracking-tight text-zinc-50">
           Imperfect
         </Link>
         <nav className="flex items-center gap-6">
@@ -24,8 +24,8 @@ export function Header() {
               href={href}
               className={`text-sm transition-colors ${
                 pathname.startsWith(href)
-                  ? "text-black font-medium"
-                  : "text-zinc-400 hover:text-zinc-700"
+                  ? "text-zinc-50 font-medium"
+                  : "text-zinc-500 hover:text-zinc-200"
               }`}
             >
               {label}

@@ -54,13 +54,13 @@ export function NewTextEntryPage() {
         <div className="mt-6 flex gap-3">
           <button
             onClick={handleAccept}
-            className="bg-black text-white rounded px-4 py-2 text-sm flex-1"
+            className="bg-zinc-100 text-zinc-900 hover:bg-white rounded-lg px-4 py-2 text-sm font-medium flex-1 transition-colors"
           >
             Aceitar
           </button>
           <button
             onClick={handleDiscard}
-            className="border rounded px-4 py-2 text-sm flex-1"
+            className="bg-zinc-800 text-zinc-200 hover:bg-zinc-700 rounded-lg px-4 py-2 text-sm flex-1 transition-colors"
           >
             Descartar
           </button>
@@ -71,28 +71,34 @@ export function NewTextEntryPage() {
 
   return (
     <main className="w-full max-w-xl mx-auto p-8">
-      <Link href="/new" className="text-sm text-zinc-400 hover:text-zinc-700 transition-colors mb-6 inline-block">
+      <Link href="/new" className="text-sm text-zinc-500 hover:text-zinc-200 transition-colors mb-6 inline-block">
         ← Voltar
       </Link>
-      <h1 className="text-2xl font-bold mb-6">Free text</h1>
+      <h1 className="text-2xl font-bold mb-6">Texto livre</h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-3 w-full">
         <textarea
           value={rawInput}
           onChange={(e) => setRawInput(e.target.value)}
           placeholder="Descreva sua refeição... ex: Almoço com frango grelhado, arroz e salada"
           rows={5}
-          className="border rounded px-3 py-2 text-sm resize-none"
+          className="bg-zinc-900 border border-zinc-800 text-zinc-50 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none rounded-lg px-3 py-2 text-sm resize-none"
           autoFocus
         />
         <button
           type="submit"
           disabled={loading || !rawInput.trim()}
-          className="bg-black text-white rounded px-4 py-2 text-sm disabled:opacity-40"
+          className="bg-zinc-800 text-zinc-100 hover:bg-zinc-700 rounded-lg px-4 py-2 text-sm disabled:opacity-30 transition-colors"
         >
           {loading ? "Analisando..." : "Analisar"}
         </button>
       </form>
-      {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
+
+      {error && <p className="mt-4 text-sm text-red-400">{error}</p>}
+      <div className="mt-6 text-center">
+        <Link href="/new" className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors">
+          tentar outra forma →
+        </Link>
+      </div>
     </main>
   );
 }

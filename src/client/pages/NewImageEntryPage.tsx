@@ -88,13 +88,13 @@ export function NewImageEntryPage() {
         <div className="mt-6 flex gap-3">
           <button
             onClick={handleAccept}
-            className="bg-black text-white rounded px-4 py-2 text-sm flex-1"
+            className="bg-zinc-100 text-zinc-900 hover:bg-white rounded-lg px-4 py-2 text-sm font-medium flex-1 transition-colors"
           >
             Aceitar
           </button>
           <button
             onClick={handleDiscard}
-            className="border rounded px-4 py-2 text-sm flex-1"
+            className="bg-zinc-800 text-zinc-200 hover:bg-zinc-700 rounded-lg px-4 py-2 text-sm flex-1 transition-colors"
           >
             Descartar
           </button>
@@ -105,10 +105,10 @@ export function NewImageEntryPage() {
 
   return (
     <main className="w-full max-w-xl mx-auto p-8">
-      <Link href="/new" className="text-sm text-zinc-400 hover:text-zinc-700 transition-colors mb-6 inline-block">
+      <Link href="/new" className="text-sm text-zinc-500 hover:text-zinc-200 transition-colors mb-6 inline-block">
         ← Voltar
       </Link>
-      <h1 className="text-2xl font-bold mb-6">Photo</h1>
+      <h1 className="text-2xl font-bold mb-6">Foto</h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-3 w-full">
         <input
           ref={fileInputRef}
@@ -124,12 +124,12 @@ export function NewImageEntryPage() {
             <img
               src={imageDataUrl}
               alt="Foto da refeição"
-              className="w-full rounded object-cover max-h-64"
+              className="w-full rounded-xl object-cover max-h-64"
             />
             <button
               type="button"
               onClick={handleClearImage}
-              className="absolute top-2 right-2 bg-black/60 text-white rounded-full w-7 h-7 flex items-center justify-center text-base leading-none"
+              className="absolute top-2 right-2 bg-zinc-900/80 text-zinc-200 rounded-full w-7 h-7 flex items-center justify-center text-base leading-none"
               aria-label="Remover imagem"
             >
               ×
@@ -139,7 +139,7 @@ export function NewImageEntryPage() {
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="border-2 border-dashed border-zinc-300 rounded px-4 py-8 text-sm text-zinc-400 hover:border-zinc-500 hover:text-zinc-600 transition-colors text-center"
+            className="bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 rounded-xl px-4 py-10 text-sm text-zinc-500 hover:text-zinc-300 transition-colors text-center"
           >
             Toque para adicionar uma foto
           </button>
@@ -149,17 +149,22 @@ export function NewImageEntryPage() {
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Descrição (opcional)"
           rows={2}
-          className="border rounded px-3 py-2 text-sm resize-none"
+          className="bg-zinc-900 border border-zinc-800 text-zinc-50 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none rounded-lg px-3 py-2 text-sm resize-none"
         />
         <button
           type="submit"
           disabled={loading || !imageDataUrl}
-          className="bg-black text-white rounded px-4 py-2 text-sm disabled:opacity-40 mt-1"
+          className="bg-zinc-800 text-zinc-100 hover:bg-zinc-700 rounded-lg px-4 py-2 text-sm disabled:opacity-30 transition-colors mt-1"
         >
           {loading ? "Analisando..." : "Analisar"}
         </button>
       </form>
-      {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
+      {error && <p className="mt-4 text-sm text-red-400">{error}</p>}
+      <div className="mt-6 text-center">
+        <Link href="/new" className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors">
+          tentar outra forma →
+        </Link>
+      </div>
     </main>
   );
 }

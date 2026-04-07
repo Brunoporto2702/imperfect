@@ -23,46 +23,46 @@ export function ItemsPage() {
 
   return (
     <main className="w-full max-w-xl mx-auto p-8 pb-28">
-      <Link href="/" className="text-sm text-zinc-400 hover:text-zinc-700 transition-colors mb-6 inline-block">
+      <Link href="/" className="text-sm text-zinc-500 hover:text-zinc-200 transition-colors mb-6 inline-block">
         ← Voltar
       </Link>
       <h1 className="text-2xl font-bold mb-6">Alimentos</h1>
 
       {daySummaries.length === 0 ? (
-        <p className="text-sm text-zinc-400">Nenhum alimento registrado ainda.</p>
+        <p className="text-sm text-zinc-500">Nenhum alimento registrado ainda.</p>
       ) : (
-        <div className="flex flex-col gap-6">
-          {daySummaries.map((day) => (
-            <div key={day.dateKey}>
+        <div className="flex flex-col">
+          {daySummaries.map((day, idx) => (
+            <div key={day.dateKey} className={idx > 0 ? "border-t border-zinc-800/40 pt-5 mt-5" : ""}>
               <div className="flex items-baseline justify-between mb-2">
-                <span className="text-sm font-semibold">{day.label}</span>
-                <span className="text-xs text-zinc-400">{day.calMin}–{day.calMax} kcal</span>
+                <span className="text-sm font-semibold text-zinc-50">{day.label}</span>
+                <span className="text-xs text-zinc-600">{day.calMin}–{day.calMax} kcal</span>
               </div>
-              <ul className="flex flex-col divide-y">
+              <ul className="flex flex-col">
                 {day.items.map((item) => (
                   <li key={item.id} className="flex items-center justify-between py-2.5 gap-4">
                     <div className="flex flex-col gap-0.5 min-w-0">
-                      <span className="text-sm truncate">
+                      <span className="text-sm text-zinc-300 truncate">
                         {item.quantity} {item.name}
                       </span>
-                      <span className="text-xs text-zinc-400">
+                      <span className="text-xs text-zinc-600">
                         {item.caloriesMin}–{item.caloriesMax} kcal
                         {item.protein != null && ` · ${item.protein}g proteína`}
                         {item.editedByUser && (
-                          <span className="ml-1.5 text-zinc-300">· editado</span>
+                          <span className="ml-1.5 text-zinc-500">· editado</span>
                         )}
                       </span>
                     </div>
                     <div className="flex items-center gap-3 shrink-0">
                       <Link
                         href={`/items/${item.id}`}
-                        className="text-xs text-zinc-400 hover:text-zinc-700 transition-colors"
+                        className="text-xs text-zinc-500 hover:text-zinc-200 transition-colors"
                       >
                         Editar
                       </Link>
                       <button
                         onClick={() => handleDelete(item.id)}
-                        className="text-zinc-300 hover:text-red-500 transition-colors text-base leading-none"
+                        className="text-zinc-600 hover:text-red-400 transition-colors text-base leading-none"
                         aria-label="Excluir item"
                       >
                         ×

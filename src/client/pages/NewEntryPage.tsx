@@ -77,13 +77,13 @@ export function NewEntryPage() {
         <div className="mt-6 flex gap-3">
           <button
             onClick={handleAccept}
-            className="bg-black text-white rounded px-4 py-2 text-sm flex-1"
+            className="bg-zinc-100 text-zinc-900 hover:bg-white rounded-lg px-4 py-2 text-sm font-medium flex-1 transition-colors"
           >
             Aceitar
           </button>
           <button
             onClick={handleDiscard}
-            className="border rounded px-4 py-2 text-sm flex-1"
+            className="bg-zinc-800 text-zinc-200 hover:bg-zinc-700 rounded-lg px-4 py-2 text-sm flex-1 transition-colors"
           >
             Descartar
           </button>
@@ -94,29 +94,29 @@ export function NewEntryPage() {
 
   return (
     <main className="w-full max-w-xl mx-auto p-8">
-      <Link href="/new" className="text-sm text-zinc-400 hover:text-zinc-700 transition-colors mb-6 inline-block">
+      <Link href="/new" className="text-sm text-zinc-500 hover:text-zinc-200 transition-colors mb-6 inline-block">
         ← Voltar
       </Link>
-      <h1 className="text-2xl font-bold mb-6">By items</h1>
+      <h1 className="text-2xl font-bold mb-6">Por itens</h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-3 w-full">
         <ItemInput onAdd={handleAdd} suggestions={suggestions} disabled={loading} />
         {stagedItems.length > 0 && (
           <ul className="flex flex-col gap-1 mt-1">
             {stagedItems.map((item, i) => (
-              <li key={i} className="flex items-center gap-2 border rounded px-3 py-2 text-sm">
-                <span className="flex-1">{item.name}</span>
+              <li key={i} className="flex items-center gap-2 bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-sm">
+                <span className="flex-1 text-zinc-200">{item.name}</span>
                 <input
                   type="text"
                   value={item.qty}
                   onChange={(e) => handleUpdateQty(i, e.target.value)}
                   placeholder="qtd"
-                  className="border rounded px-2 py-1 w-16 text-xs text-center text-zinc-600"
+                  className="bg-zinc-800 border border-zinc-700 rounded px-2 py-1 w-16 text-xs text-center text-zinc-300 focus:outline-none focus:border-zinc-600"
                 />
                 <button
                   type="button"
                   onClick={() => handleRemove(i)}
                   aria-label="Remover item"
-                  className="text-zinc-300 hover:text-red-500 transition-colors text-base leading-none"
+                  className="text-zinc-600 hover:text-red-400 transition-colors text-base leading-none"
                 >
                   ×
                 </button>
@@ -127,12 +127,17 @@ export function NewEntryPage() {
         <button
           type="submit"
           disabled={loading || stagedItems.length === 0}
-          className="bg-black text-white rounded px-4 py-2 text-sm disabled:opacity-40 mt-1"
+          className="bg-zinc-800 text-zinc-100 hover:bg-zinc-700 rounded-lg px-4 py-2 text-sm disabled:opacity-30 transition-colors mt-1"
         >
           {loading ? "Analisando..." : "Analisar"}
         </button>
       </form>
-      {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
+      {error && <p className="mt-4 text-sm text-red-400">{error}</p>}
+      <div className="mt-6 text-center">
+        <Link href="/new" className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors">
+          tentar outra forma →
+        </Link>
+      </div>
     </main>
   );
 }

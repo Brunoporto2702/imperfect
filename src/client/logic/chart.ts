@@ -7,7 +7,7 @@ export type DayBar = {
   calMid: number;
 };
 
-const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const DAY_LABELS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
 export function buildWeeklyChart(items: IntakeItem[]): DayBar[] {
   return Array.from({ length: 7 }, (_, i) => {
