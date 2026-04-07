@@ -182,7 +182,7 @@ export function WeeklyCaloriesChart({
         </div>
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-0.5 bg-zinc-600 rounded-full" />
-          <span className="text-[10px] text-zinc-400">estimate</span>
+          <span className="text-[10px] text-zinc-400">estimativa</span>
         </div>
         {weeklyAvgMid !== null && (
           <div className="flex items-center gap-1.5">
@@ -194,7 +194,7 @@ export function WeeklyCaloriesChart({
                 className="stroke-zinc-400"
               />
             </svg>
-            <span className="text-[10px] text-zinc-400">weekly avg</span>
+            <span className="text-[10px] text-zinc-400">média semanal</span>
           </div>
         )}
         {target != null && (
@@ -207,7 +207,7 @@ export function WeeklyCaloriesChart({
                 className="stroke-blue-400"
               />
             </svg>
-            <span className="text-[10px] text-blue-400">target</span>
+            <span className="text-[10px] text-blue-400">meta</span>
           </div>
         )}
       </div>

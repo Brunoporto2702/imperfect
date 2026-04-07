@@ -113,6 +113,7 @@ export function DashboardPage() {
                   value={targetInput}
                   onChange={(e) => setTargetInput(e.target.value)}
                   onBlur={handleTargetBlur}
+                  style={{ colorScheme: "dark" }}
                   className="w-20 text-xs bg-zinc-900 border border-zinc-800 rounded-lg px-2 py-1 text-right text-blue-400 placeholder:text-zinc-700 focus:outline-none focus:border-zinc-600"
                 />
               </div>
