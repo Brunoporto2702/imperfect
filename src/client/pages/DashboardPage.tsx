@@ -76,7 +76,7 @@ export function DashboardPage() {
             </h2>
             <div className="flex gap-8 mb-4">
               <div>
-                <p className="text-2xl font-bold text-zinc-50">{weekly.calMin}–{weekly.calMax}</p>
+                <p className="text-2xl font-bold text-zinc-50">~{Math.round((weekly.calMin + weekly.calMax) / 2)}</p>
                 <p className="text-xs text-zinc-500 mt-0.5">kcal</p>
               </div>
               {weekly.protein > 0 && (
@@ -129,7 +129,7 @@ export function DashboardPage() {
                   <span className="text-sm font-semibold text-zinc-50">{day.label}</span>
                   <div className="flex items-baseline gap-3">
                     <span className="text-xs text-zinc-600">
-                      {day.calMin}–{day.calMax} kcal
+                      ~{Math.round((day.calMin + day.calMax) / 2)} kcal
                     </span>
                     <Link href="/items" className="text-xs text-zinc-500 hover:text-zinc-200 transition-colors">
                       Editar
@@ -143,7 +143,7 @@ export function DashboardPage() {
                         {item.quantity} {item.name}
                       </span>
                       <span className="text-xs text-zinc-600 ml-4 shrink-0">
-                        {item.caloriesMin}–{item.caloriesMax} kcal
+                        ~{Math.round((item.caloriesMin + item.caloriesMax) / 2)} kcal
                         {item.protein != null && ` · ${item.protein}g`}
                       </span>
                     </li>
