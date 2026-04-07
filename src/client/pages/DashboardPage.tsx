@@ -17,6 +17,7 @@ const SENTIMENT_STYLES = {
 };
 
 export function DashboardPage() {
+  const [loaded, setLoaded] = useState(false);
   const [entries, setEntries] = useState<IntakeEntry[]>([]);
   const [items, setItems] = useState<IntakeItem[]>([]);
   const [target, setTarget] = useState<number | null>(null);
@@ -28,6 +29,7 @@ export function DashboardPage() {
     const stored = loadTarget();
     setTarget(stored);
     setTargetInput(stored != null ? String(stored) : "");
+    setLoaded(true);
   }, []);
 
   function handleTargetBlur() {
@@ -41,6 +43,8 @@ export function DashboardPage() {
       setTarget(parsed);
     }
   }
+
+  if (!loaded) return null;
 
   const weekly = getWeeklyStats(items);
   const insight = getWeeklyInsight(items, target);
