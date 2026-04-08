@@ -87,24 +87,24 @@ export function EditItemPage({ id }: { id: string }) {
           />
         </div>
 
-        <div className="flex gap-3">
-          <div className="flex flex-col gap-1 flex-1">
-            <label className="text-xs text-zinc-500">Calorias mín.</label>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-zinc-500">Faixa de calorias (kcal)</label>
+          <div className="flex items-center gap-2">
             <input
               type="number"
               min={0}
-              className="bg-zinc-900 border border-zinc-800 text-zinc-50 focus:border-zinc-600 focus:outline-none rounded-lg px-3 py-2 text-sm"
+              placeholder="mín"
+              className="bg-zinc-900 border border-zinc-800 text-zinc-50 focus:border-zinc-600 focus:outline-none rounded-lg px-3 py-2 text-sm flex-1"
               value={form.caloriesMin}
               onChange={(e) => setForm((f) => ({ ...f, caloriesMin: e.target.value }))}
               required
             />
-          </div>
-          <div className="flex flex-col gap-1 flex-1">
-            <label className="text-xs text-zinc-500">Calorias máx.</label>
+            <span className="text-zinc-600 text-sm">—</span>
             <input
               type="number"
               min={0}
-              className="bg-zinc-900 border border-zinc-800 text-zinc-50 focus:border-zinc-600 focus:outline-none rounded-lg px-3 py-2 text-sm"
+              placeholder="máx"
+              className="bg-zinc-900 border border-zinc-800 text-zinc-50 focus:border-zinc-600 focus:outline-none rounded-lg px-3 py-2 text-sm flex-1"
               value={form.caloriesMax}
               onChange={(e) => setForm((f) => ({ ...f, caloriesMax: e.target.value }))}
               required

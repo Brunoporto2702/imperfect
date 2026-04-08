@@ -50,6 +50,7 @@ export function DashboardPage() {
   const insight = getWeeklyInsight(items, target);
   const chartDays = buildWeeklyChart(items);
   const daySummaries = getDaySummaries(items);
+  const hasItemsToday = daySummaries.length > 0 && daySummaries[0].label === "Hoje";
 
   return (
     <main className="w-full max-w-xl mx-auto p-8 pb-28">
@@ -121,31 +122,49 @@ export function DashboardPage() {
             <WeeklyCaloriesChart days={chartDays} target={target ?? undefined} />
           </div>
 
+          {/* Prompt when no items today */}
+          {!hasItemsToday && (
+            <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-xl px-4 py-3 mb-6 flex items-center justify-between gap-4">
+              <span className="text-xs text-zinc-500">Sem registros hoje ainda.</span>
+              <div className="flex gap-3 shrink-0">
+                <Link href="/new/history" className="text-xs text-zinc-400 hover:text-zinc-200 transition-colors">
+                  Histórico
+                </Link>
+                <Link href="/new" className="text-xs text-zinc-100 hover:text-white transition-colors font-medium">
+                  + Nova entrada
+                </Link>
+              </div>
+            </div>
+          )}
+
           {/* Day summaries */}
           <div className="flex flex-col">
             {daySummaries.map((day, idx) => (
               <div key={day.dateKey} className={idx > 0 ? "border-t border-zinc-800/50 pt-5 mt-5" : ""}>
                 <div className="flex items-baseline justify-between mb-2">
                   <span className="text-sm font-semibold text-zinc-50">{day.label}</span>
-                  <div className="flex items-baseline gap-3">
-                    <span className="text-xs text-zinc-600">
-                      ~{Math.round((day.calMin + day.calMax) / 2)} kcal
-                    </span>
-                    <Link href="/items" className="text-xs text-zinc-500 hover:text-zinc-200 transition-colors">
-                      Editar
-                    </Link>
-                  </div>
+                  <span className="text-xs text-zinc-600">
+                    ~{Math.round((day.calMin + day.calMax) / 2)} kcal
+                  </span>
                 </div>
                 <ul className="flex flex-col gap-1">
                   {day.items.map((item) => (
-                    <li key={item.id} className="flex items-baseline justify-between text-sm">
-                      <span className="text-zinc-400">
+                    <li key={item.id} className="flex items-center justify-between text-sm gap-4">
+                      <span className="text-zinc-400 truncate">
                         {item.quantity} {item.name}
                       </span>
-                      <span className="text-xs text-zinc-600 ml-4 shrink-0">
-                        ~{Math.round((item.caloriesMin + item.caloriesMax) / 2)} kcal
-                        {item.protein != null && ` · ${item.protein}g`}
-                      </span>
+                      <div className="flex items-center gap-3 shrink-0">
+                        <span className="text-xs text-zinc-600">
+                          ~{Math.round((item.caloriesMin + item.caloriesMax) / 2)} kcal
+                          {item.protein != null && ` · ${item.protein}g`}
+                        </span>
+                        <Link
+                          href={`/items/${item.id}`}
+                          className="text-xs text-zinc-600 hover:text-zinc-300 transition-colors"
+                        >
+                          editar
+                        </Link>
+                      </div>
                     </li>
                   ))}
                 </ul>
@@ -155,6 +174,18 @@ export function DashboardPage() {
         </>
       )}
 
+      {items.length > 0 && (
+        <Link
+          href="/new/history"
+          aria-label="Do histórico"
+          className="fixed bottom-6 right-24 w-10 h-10 bg-zinc-800 text-zinc-300 hover:bg-zinc-700 rounded-full flex items-center justify-center shadow-lg transition-colors"
+        >
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <circle cx="10" cy="10" r="7" stroke="currentColor" strokeWidth="1.25"/>
+            <path d="M10 6.5V10l2.5 2" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </Link>
+      )}
       <Link
         href="/new"
         aria-label="Nova entrada"
