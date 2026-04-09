@@ -60,13 +60,13 @@ export function NewEntryPage() {
     }
   }
 
-  function handleAccept() {
+  async function handleAccept() {
     if (!preview) return;
     addIntakeEntry(preview.entry);
     addIntakeItems(preview.items);
     const userId = loadUserId();
     if (userId) {
-      syncItemsToCloud(userId, preview.items).catch(() => {});
+      await syncItemsToCloud(userId, preview.items).catch(() => {});
     }
     showToast("Entrada salva.");
     router.push("/");
