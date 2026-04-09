@@ -9,7 +9,8 @@ import { loadUserId } from "@/client/features/profile/user";
 import { patchItemOnCloud } from "@/client/features/entries/sync";
 
 function toDateTimeLocal(iso: string): string {
-  return iso.slice(0, 16);
+  const d = new Date(iso);
+  return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
 }
 
 export function EditItemPage({ id }: { id: string }) {

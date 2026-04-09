@@ -1,5 +1,9 @@
 import type { IntakeItem } from "@/server/food/core/models/food";
 
+function localDateKey(iso: string): string {
+  return new Date(iso).toLocaleDateString("sv");
+}
+
 export function getWeeklyStats(items: IntakeItem[]) {
   const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
   const week = items.filter((item) => item.consumedAt >= weekAgo);
@@ -24,13 +28,13 @@ export function getDaySummaries(items: IntakeItem[]): DaySummary[] {
   const byDay = new Map<string, IntakeItem[]>();
 
   for (const item of items) {
-    const dateKey = item.consumedAt.slice(0, 10);
+    const dateKey = localDateKey(item.consumedAt);
     if (!byDay.has(dateKey)) byDay.set(dateKey, []);
     byDay.get(dateKey)!.push(item);
   }
 
-  const today = new Date().toISOString().slice(0, 10);
-  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  const today = new Date().toLocaleDateString("sv");
+  const yesterday = new Date(Date.now() - 86400000).toLocaleDateString("sv");
 
   return Array.from(byDay.entries())
     .sort(([a], [b]) => b.localeCompare(a))
@@ -66,9 +70,9 @@ export function getWeeklyInsight(
     return { message: "Registre refeições para ver o insight da semana.", sentiment: "neutral" };
   }
 
-  const days = new Set(weekItems.map((item) => item.consumedAt.slice(0, 10)));
+  const days = new Set(weekItems.map((item) => localDateKey(item.consumedAt)));
   const dailyMids = Array.from(days).map((day) => {
-    const dayItems = weekItems.filter((item) => item.consumedAt.startsWith(day));
+    const dayItems = weekItems.filter((item) => localDateKey(item.consumedAt) === day);
     const calMin = dayItems.reduce((s, i) => s + i.caloriesMin, 0);
     const calMax = dayItems.reduce((s, i) => s + i.caloriesMax, 0);
     return Math.round((calMin + calMax) / 2);
