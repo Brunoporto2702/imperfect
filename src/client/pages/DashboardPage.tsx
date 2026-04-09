@@ -172,7 +172,7 @@ export function DashboardPage() {
               </div>
               {weekly.protein > 0 && (
                 <div>
-                  <p className="text-2xl font-bold text-zinc-50">{weekly.protein}g</p>
+                  <p className="text-2xl font-bold text-zinc-50">{Math.round(weekly.protein * 10) / 10}g</p>
                   <p className="text-xs text-zinc-500 mt-0.5">proteína</p>
                 </div>
               )}
@@ -246,7 +246,7 @@ export function DashboardPage() {
                       <div className="flex items-center gap-3 shrink-0">
                         <span className="text-xs text-zinc-600">
                           ~{Math.round((item.caloriesMin + item.caloriesMax) / 2)} kcal
-                          {item.protein != null && ` · ${item.protein}g`}
+                          {item.protein != null && ` · ${Math.round(item.protein * 10) / 10}g`}
                         </span>
                         <Link
                           href={`/items/${item.id}`}

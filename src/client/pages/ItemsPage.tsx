@@ -53,7 +53,7 @@ export function ItemsPage() {
                       </span>
                       <span className="text-xs text-zinc-600">
                         {item.caloriesMin}–{item.caloriesMax} kcal
-                        {item.protein != null && ` · ${item.protein}g proteína`}
+                        {item.protein != null && ` · ${Math.round(item.protein * 10) / 10}g proteína`}
                         {item.editedByUser && (
                           <span className="ml-1.5 text-zinc-500">· editado</span>
                         )}
