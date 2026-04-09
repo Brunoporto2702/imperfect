@@ -43,12 +43,12 @@ export function EmailCaptureModal({ onSuccess, onDismiss, mode = "save" }: Props
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-4">
       <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 w-full max-w-sm">
         <h2 className="text-lg font-bold text-zinc-50 mb-1">
-          {mode === "login" ? "Acessar minha conta" : "Salvar seus dados"}
+          {mode === "login" ? "De volta por aqui?" : "Não perde o que você construiu"}
         </h2>
         <p className="text-sm text-zinc-400 mb-5">
           {mode === "login"
-            ? "Informe o email da sua conta para carregar seus dados."
-            : "Você já tem 3 entradas. Informe seu email para salvar na nuvem e acessar de qualquer dispositivo."}
+            ? "É só o email — a gente traz tudo na hora."
+            : "Já tem 3 registros. Com seu email a gente guarda tudo — troca de celular, limpa o app, não importa."}
         </p>
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <input
@@ -65,7 +65,7 @@ export function EmailCaptureModal({ onSuccess, onDismiss, mode = "save" }: Props
             disabled={loading}
             className="bg-zinc-100 text-zinc-900 hover:bg-white rounded-lg px-4 py-2.5 text-sm font-medium disabled:opacity-40 transition-colors"
           >
-            {loading ? "Carregando..." : mode === "login" ? "Entrar" : "Salvar na nuvem"}
+            {loading ? "Carregando..." : mode === "login" ? "Continuar" : "Guardar meus dados"}
           </button>
           <button
             type="button"

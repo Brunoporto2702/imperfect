@@ -153,9 +153,9 @@ export function DashboardPage() {
           </Link>
           <button
             onClick={() => { setEmailModalMode("login"); setShowEmailModal(true); }}
-            className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors"
+            className="text-xs text-zinc-500 hover:text-zinc-300 underline underline-offset-2 transition-colors"
           >
-            já tenho conta
+            já tenho conta — trazer meus dados
           </button>
         </div>
       ) : (
