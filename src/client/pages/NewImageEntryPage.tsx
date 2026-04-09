@@ -7,6 +7,8 @@ import type { IntakeEntry, IntakeItem } from "@/server/food/core/models/food";
 import { createImageEntry } from "@/client/features/entries/api";
 import { addIntakeEntry } from "@/client/features/entries/intakeEntries";
 import { addIntakeItems } from "@/client/features/entries/intakeItems";
+import { loadUserId } from "@/client/features/profile/user";
+import { syncItemsToCloud } from "@/client/features/entries/sync";
 import { useToast } from "@/client/infra/toast";
 import { EntryCard } from "@/client/components/EntryCard";
 
@@ -56,9 +58,11 @@ export function NewImageEntryPage() {
     setError(null);
 
     try {
+      const userId = loadUserId() ?? undefined;
       const { intakeEntry, intakeItems } = await createImageEntry(
         imageDataUrl,
-        description.trim() || undefined
+        description.trim() || undefined,
+        userId
       );
       setPreview({ entry: intakeEntry, items: intakeItems });
     } catch (err) {
@@ -68,10 +72,14 @@ export function NewImageEntryPage() {
     }
   }
 
-  function handleAccept() {
+  async function handleAccept() {
     if (!preview) return;
     addIntakeEntry(preview.entry);
     addIntakeItems(preview.items);
+    const userId = loadUserId();
+    if (userId) {
+      await syncItemsToCloud(userId, preview.items).catch(() => {});
+    }
     showToast("Entrada salva.");
     router.push("/");
   }

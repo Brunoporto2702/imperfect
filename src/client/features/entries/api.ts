@@ -10,8 +10,8 @@ export function createItemsEntry(rawInput: string, userId?: string): Promise<Cre
   return post<CreateEntryResponse>("/api/entries", { inputType: "items", rawInput, userId });
 }
 
-export function createImageEntry(imageDataUrl: string, description?: string): Promise<CreateEntryResponse> {
-  return post<CreateEntryResponse>("/api/entries", { inputType: "image", imageDataUrl, description });
+export function createImageEntry(imageDataUrl: string, description?: string, userId?: string): Promise<CreateEntryResponse> {
+  return post<CreateEntryResponse>("/api/entries", { inputType: "image", imageDataUrl, description, userId });
 }
 
 export function createTextEntry(rawInput: string): Promise<CreateEntryResponse> {
