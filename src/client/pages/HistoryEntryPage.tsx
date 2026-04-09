@@ -10,6 +10,8 @@ import { addIntakeItems, loadIntakeItems } from "@/client/features/entries/intak
 import { useToast } from "@/client/infra/toast";
 import { EntryCard } from "@/client/components/EntryCard";
 import { ItemInput } from "@/client/components/ItemInput";
+import { loadUserId } from "@/client/features/profile/user";
+import { syncItemsToCloud } from "@/client/features/entries/sync";
 
 function HistoryRow({
   item,
@@ -195,10 +197,11 @@ export function HistoryEntryPage() {
     setLoading(true);
     setError(null);
     try {
+      const userId = loadUserId() ?? undefined;
       const rawInput = stagedItems
         .map((i) => (i.qty ? `${i.qty} ${i.name}` : i.name))
         .join("\n");
-      const { intakeEntry, intakeItems } = await createItemsEntry(rawInput);
+      const { intakeEntry, intakeItems } = await createItemsEntry(rawInput, userId);
       setPreview({ entry: intakeEntry, items: intakeItems });
       setPhase("preview");
     } catch (err) {
@@ -208,10 +211,14 @@ export function HistoryEntryPage() {
     }
   }
 
-  function handleAccept() {
+  async function handleAccept() {
     if (!preview) return;
     addIntakeEntry(preview.entry);
     addIntakeItems(preview.items);
+    const userId = loadUserId();
+    if (userId) {
+      await syncItemsToCloud(userId, preview.items).catch(() => {});
+    }
     showToast("Entrada salva.");
     router.push("/");
   }
@@ -221,8 +228,12 @@ export function HistoryEntryPage() {
     setPhase("stage");
   }
 
-  function handleSaveDirect() {
+  async function handleSaveDirect() {
     addIntakeItems(directItems);
+    const userId = loadUserId();
+    if (userId) {
+      await syncItemsToCloud(userId, directItems).catch(() => {});
+    }
     showToast("Entrada salva.");
     router.push("/");
   }
