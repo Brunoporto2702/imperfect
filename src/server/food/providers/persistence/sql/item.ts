@@ -48,8 +48,52 @@ export async function updateItem(
   db: SqlDb,
   userId: string,
   id: string,
-  patch: Partial<Pick<IntakeItem, "name" | "quantity" | "caloriesMin" | "caloriesMax" | "protein" | "consumedAt" | "editedByUser" | "updatedAt">>
+  patch: Partial<Pick<IntakeItem, "name" | "quantity" | "caloriesMin" | "caloriesMax" | "protein" | "consumedAt" | "source" | "processingId" | "editedByUser" | "createdAt" | "updatedAt">>
 ): Promise<void> {
+  // Full upsert when all fields are present — handles items not yet in the DB
+  if (
+    patch.name !== undefined &&
+    patch.quantity !== undefined &&
+    patch.caloriesMin !== undefined &&
+    patch.caloriesMax !== undefined &&
+    patch.consumedAt !== undefined &&
+    patch.source !== undefined &&
+    patch.createdAt !== undefined &&
+    patch.updatedAt !== undefined
+  ) {
+    await db.execute(
+      `INSERT INTO intake_items (id, user_id, entry_id, name, quantity, calories_min, calories_max, protein, consumed_at, source, edited_by_user, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+       ON CONFLICT(id) DO UPDATE SET
+         name = excluded.name,
+         quantity = excluded.quantity,
+         calories_min = excluded.calories_min,
+         calories_max = excluded.calories_max,
+         protein = excluded.protein,
+         consumed_at = excluded.consumed_at,
+         source = excluded.source,
+         edited_by_user = excluded.edited_by_user,
+         updated_at = excluded.updated_at`,
+      [
+        id,
+        userId,
+        patch.processingId ?? null,
+        patch.name,
+        patch.quantity,
+        patch.caloriesMin,
+        patch.caloriesMax,
+        patch.protein ?? null,
+        patch.consumedAt,
+        patch.source,
+        patch.editedByUser ? 1 : 0,
+        patch.createdAt,
+        patch.updatedAt,
+      ] as import("@/server/lib/sql-db/sql-db").SqlParam[]
+    );
+    return;
+  }
+
+  // Partial update fallback
   const sets: string[] = [];
   const params: unknown[] = [];
 

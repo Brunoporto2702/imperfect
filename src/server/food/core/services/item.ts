@@ -10,7 +10,10 @@ export type ItemPatch = {
   caloriesMax?: number;
   protein?: number | null;
   consumedAt?: string;
+  source?: "ai" | "manual";
+  processingId?: string | null;
   editedByUser?: boolean;
+  createdAt?: string;
   updatedAt?: string;
 };
 

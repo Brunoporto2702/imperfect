@@ -17,7 +17,10 @@ const PatchBodySchema = z.object({
   caloriesMax: z.number().optional(),
   protein: z.number().nullable().optional(),
   consumedAt: z.string().optional(),
+  source: z.enum(["ai", "manual"]).optional(),
+  processingId: z.string().nullable().optional(),
   editedByUser: z.boolean().optional(),
+  createdAt: z.string().optional(),
   updatedAt: z.string().optional(),
 });
 

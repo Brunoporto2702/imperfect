@@ -34,7 +34,10 @@ export function patchItemOnCloud(userId: string, item: IntakeItem): Promise<{ ok
     caloriesMax: item.caloriesMax,
     protein: item.protein ?? null,
     consumedAt: item.consumedAt,
+    source: item.source,
+    processingId: item.processingId ?? null,
     editedByUser: item.editedByUser,
+    createdAt: item.createdAt,
     updatedAt: item.updatedAt,
   });
 }
