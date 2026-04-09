@@ -66,7 +66,7 @@ export function EditItemPage({ id }: { id: string }) {
   if (!item) return null;
 
   return (
-    <main className="w-full max-w-xl mx-auto p-8">
+    <main className="w-full max-w-xl mx-auto px-4 py-8 sm:px-8">
       <Link href="/items" className="text-sm text-zinc-500 hover:text-zinc-200 transition-colors mb-6 inline-block">
         ← Voltar
       </Link>
