@@ -14,6 +14,6 @@ export function createImageEntry(imageDataUrl: string, description?: string, use
   return post<CreateEntryResponse>("/api/entries", { inputType: "image", imageDataUrl, description, userId });
 }
 
-export function createTextEntry(rawInput: string): Promise<CreateEntryResponse> {
-  return post<CreateEntryResponse>("/api/entries", { inputType: "text", rawInput });
+export function createTextEntry(rawInput: string, userId?: string): Promise<CreateEntryResponse> {
+  return post<CreateEntryResponse>("/api/entries", { inputType: "text", rawInput, userId });
 }

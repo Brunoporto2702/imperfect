@@ -7,6 +7,8 @@ import type { IntakeEntry, IntakeItem } from "@/server/food/core/models/food";
 import { createTextEntry } from "@/client/features/entries/api";
 import { addIntakeEntry } from "@/client/features/entries/intakeEntries";
 import { addIntakeItems } from "@/client/features/entries/intakeItems";
+import { loadUserId } from "@/client/features/profile/user";
+import { syncItemsToCloud } from "@/client/features/entries/sync";
 import { useToast } from "@/client/infra/toast";
 import { EntryCard } from "@/client/components/EntryCard";
 
@@ -25,7 +27,8 @@ export function NewTextEntryPage() {
     setError(null);
 
     try {
-      const { intakeEntry, intakeItems } = await createTextEntry(rawInput.trim());
+      const userId = loadUserId() ?? undefined;
+      const { intakeEntry, intakeItems } = await createTextEntry(rawInput.trim(), userId);
       setPreview({ entry: intakeEntry, items: intakeItems });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
@@ -34,10 +37,14 @@ export function NewTextEntryPage() {
     }
   }
 
-  function handleAccept() {
+  async function handleAccept() {
     if (!preview) return;
     addIntakeEntry(preview.entry);
     addIntakeItems(preview.items);
+    const userId = loadUserId();
+    if (userId) {
+      await syncItemsToCloud(userId, preview.items).catch(() => {});
+    }
     showToast("Entrada salva.");
     router.push("/");
   }
