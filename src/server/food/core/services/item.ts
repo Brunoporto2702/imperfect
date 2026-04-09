@@ -29,6 +29,7 @@ export async function updateItem(db: SqlDb, userId: string, id: string, patch: I
   await ItemRepository.updateItem(db, userId, id, {
     ...patch,
     protein: patch.protein === null ? undefined : patch.protein,
+    processingId: patch.processingId === null ? undefined : patch.processingId,
   });
 }
 
