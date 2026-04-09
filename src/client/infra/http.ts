@@ -1,6 +1,6 @@
-export async function post<T>(url: string, body: unknown): Promise<T> {
+async function request<T>(method: string, url: string, body: unknown): Promise<T> {
   const res = await fetch(url, {
-    method: "POST",
+    method,
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
@@ -11,4 +11,16 @@ export async function post<T>(url: string, body: unknown): Promise<T> {
   }
 
   return res.json();
+}
+
+export function post<T>(url: string, body: unknown): Promise<T> {
+  return request<T>("POST", url, body);
+}
+
+export function patch<T>(url: string, body: unknown): Promise<T> {
+  return request<T>("PATCH", url, body);
+}
+
+export function del<T>(url: string, body: unknown): Promise<T> {
+  return request<T>("DELETE", url, body);
 }

@@ -14,7 +14,8 @@ export type CreateEntryResult = {
 export async function createEntry(
   request: CreateEntryRequest,
   provider: AIProvider,
-  db: SqlDb
+  db: SqlDb,
+  userId?: string
 ): Promise<CreateEntryResult> {
   const payload = buildPrompt(request);
   const rawText = await provider(payload);
@@ -24,6 +25,6 @@ export async function createEntry(
       : request.description ?? "[image]";
   const intakeEntry = parseAIResponse(rawText, inputText);
   const intakeItems = buildIntakeItems(intakeEntry);
-  await EntryRepository.save(db, intakeEntry);
+  await EntryRepository.save(db, intakeEntry, userId);
   return { intakeEntry, intakeItems };
 }

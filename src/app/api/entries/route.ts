@@ -20,8 +20,10 @@ export function createHandler(provider: AIProvider, db: SqlDb) {
       return NextResponse.json({ error: result.error.flatten() }, { status: 400 });
     }
 
+    const userId = typeof body.userId === "string" ? body.userId : undefined;
+
     try {
-      const { intakeEntry, intakeItems } = await createEntry(result.data, provider, db);
+      const { intakeEntry, intakeItems } = await createEntry(result.data, provider, db, userId);
       return NextResponse.json({ intakeEntry, intakeItems });
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to parse food";

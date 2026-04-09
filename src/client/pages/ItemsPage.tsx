@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import type { IntakeItem } from "@/server/food/core/models/food";
 import { loadIntakeItems, deleteIntakeItem } from "@/client/features/entries/intakeItems";
+import { loadUserId } from "@/client/features/profile/user";
+import { deleteItemOnCloud } from "@/client/features/entries/sync";
 import { getDaySummaries } from "@/client/logic/entries";
 
 export function ItemsPage() {
@@ -17,6 +19,10 @@ export function ItemsPage() {
     if (!confirm("Excluir este alimento?")) return;
     deleteIntakeItem(id);
     setItems((prev) => prev.filter((item) => item.id !== id));
+    const userId = loadUserId();
+    if (userId) {
+      deleteItemOnCloud(userId, id).catch(() => {});
+    }
   }
 
   const daySummaries = getDaySummaries(items);

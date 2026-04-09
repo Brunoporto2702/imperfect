@@ -7,6 +7,8 @@ import type { IntakeEntry, IntakeItem } from "@/server/food/core/models/food";
 import { createItemsEntry } from "@/client/features/entries/api";
 import { addIntakeEntry } from "@/client/features/entries/intakeEntries";
 import { addIntakeItems, loadIntakeItems } from "@/client/features/entries/intakeItems";
+import { loadUserId } from "@/client/features/profile/user";
+import { syncItemsToCloud } from "@/client/features/entries/sync";
 import { useToast } from "@/client/infra/toast";
 import { EntryCard } from "@/client/components/EntryCard";
 import { ItemInput } from "@/client/components/ItemInput";
@@ -48,7 +50,8 @@ export function NewEntryPage() {
       const rawInput = stagedItems
         .map((i) => (i.qty ? `${i.qty} ${i.name}` : i.name))
         .join("\n");
-      const { intakeEntry, intakeItems } = await createItemsEntry(rawInput);
+      const userId = loadUserId() ?? undefined;
+      const { intakeEntry, intakeItems } = await createItemsEntry(rawInput, userId);
       setPreview({ entry: intakeEntry, items: intakeItems });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
@@ -61,6 +64,10 @@ export function NewEntryPage() {
     if (!preview) return;
     addIntakeEntry(preview.entry);
     addIntakeItems(preview.items);
+    const userId = loadUserId();
+    if (userId) {
+      syncItemsToCloud(userId, preview.items).catch(() => {});
+    }
     showToast("Entrada salva.");
     router.push("/");
   }

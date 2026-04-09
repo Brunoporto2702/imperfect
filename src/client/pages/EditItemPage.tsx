@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import type { IntakeItem } from "@/server/food/core/models/food";
 import { loadIntakeItems, updateIntakeItem } from "@/client/features/entries/intakeItems";
+import { loadUserId } from "@/client/features/profile/user";
+import { patchItemOnCloud } from "@/client/features/entries/sync";
 
 function toDateTimeLocal(iso: string): string {
   return iso.slice(0, 16);
@@ -54,6 +56,10 @@ export function EditItemPage({ id }: { id: string }) {
     };
 
     updateIntakeItem(updated);
+    const userId = loadUserId();
+    if (userId) {
+      patchItemOnCloud(userId, updated).catch(() => {});
+    }
     router.push("/items");
   }
 
